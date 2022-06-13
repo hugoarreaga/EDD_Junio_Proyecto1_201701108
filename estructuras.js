@@ -1,33 +1,39 @@
 /**
  * VALUE DEBERA DE SER EL OBJETO QUE ALMACENA LA ESTRUCTURA
- * Manejar un solo "nodo" para las estructuras lineales? y/n
+ * Manejar un solo "Nodo" para las estructuras lineales? y/n
  */
-class nodo{
+class Nodo {
     /**
      * 
-     * @param {String} value 
+     * @param {int} fila 
+     * @param {int} columna 
+     * @param {String} valor 
      */
-    constructor(value){
-        this.value = value
-        this.abajo = null
-        this.arriba = null
+    constructor(fila, columna, valor) {
+        this.fila = fila
+        this.columna = columna
+        this.valor = valor
+
+
         this.derecha = null
         this.izquierda = null
+        this.arriba = null
+        this.abajo = null
     }
 }
 
 /**
- * CLASE NODO PARA ALMACENER LOS ENCABEZADOS 
+ * CLASE Nodo PARA ALMACENER LOS ENCABEZADOS 
  * DE LA CLASE MATRIZ
  */
-class nodoE{
-    /**
-     * 
-     * @param {int} id 
+class NodoE {
+    /** 
+     * @param {int} id nuevo identificador del nodo eje
      */
-    constructor(id){
-        this.id = id
+    constructor(id) {
+        this.id = id/**INTEGER **/
         this.acceso = null
+
         this.siguiente = null
         this.anterior = null
     }
@@ -37,31 +43,32 @@ class nodoE{
  * CLASE LISTA PARA ALMACENAR LOS EJES DE LA
  * MATRIZ 
  */
-class listaE{
-    constructor(){
+class listaE {
+    constructor() {
         this.primero = null
         this.ultimo = null
     }
 
     /**
-     * insertar en orden los datos en los ejes de la matriz
-     * no es necesario de verificar repetidos
-     * @param {nodoE} nuevo 
+     * insertar en orden los valors en los ejes de la matriz
+     * no es necesario de verificar repetidos *por ahora
+     * @param {NodoE} nuevo nodo encabezado para agreagar al eje
      */
-    setE(nuevo){
+    setE(nuevo) {
         // es el primero
-        if(this.primero == null){
+        if (this.primero == null) {
             this.primero = nuevo
-        // agregar al inicio    
-        }else if(nuevo.id < this.primero.id){
+            this.ultimo = nuevo
+            // agregar al inicio    
+        } else if (nuevo.id < this.primero.id) {
             nuevo.siguiente = this.primero
             this.primero.anterior = nuevo
             this.primero = nuevo
-        }else{
+        } else {
             // agregar en el medio
             let actual = this.primero
-            while(actual.siguiente != null){
-                if(nuevo.id < actual.siguiente.id){
+            while (actual.siguiente != null) {
+                if (nuevo.id < actual.siguiente.id) {
                     nuevo.siguiente = actual.siguiente
                     nuevo.anterior = actual
                     actual.siguiente.anterior = nuevo
@@ -71,21 +78,23 @@ class listaE{
                 actual = actual.siguiente
             }
             // agregar al final
-            if(actual.siguiente = null){
-                actual.siguiente = nuevo
+            if (actual.siguiente = null) {
                 nuevo.anterior = actual
+                actual.siguiente = nuevo
                 this.ultimo = nuevo
             }
         }
     }
     /**
-     * retorna un objeto de tipo nodoE
+     * retorna un objeto de tipo NodoE
      * @param { int} id 
      */
-    getE(id){
+    getE(id) {
         let actual = this.primero
-        while(actual != null){
-            if(actual.id == id){
+        while (actual != null) {
+            if (actual.id == id) {
+
+                console.log("encontrado " + id)
                 return actual
             }
             actual = actual.siguiente
@@ -95,105 +104,168 @@ class listaE{
 }
 
 /**
- * MATRIZ DISPERSA PARA ALMACENAR DATOS
+ * MATRIZ DISPERSA PARA ALMACENAR valorS
  */
-class Matriz{
-    constructor(){
+class Matriz {
+    constructor() {
+        this.nombre = ""
         this.filas = new listaE()
         this.columnas = new listaE()
+        this.textAux = ""
     }
     /**
      * 
      * @param {int} fila 
      * @param {int} columna 
-     * @param {String} dato 
+     * @param {String} valor 
      */
-    insertar(fila,columna,dato){
-        let nuevo = new nodo()
-        
+    insertar(fila, columna, valor) {
+        let nuevo = new Nodo(fila, columna, valor)
+
+        if( fila == columna == 1){
+            console.log(22)
+        }
         // *-*-*-*-* metodo para omitir repetidos
 
-        let filaActual = this.filas.getE(dato)
+        /***
+         *  AGREGAR NodoS EN EL EJE DE LAS FILAS
+         * @param {NodoE} filaActual primer nodo del eje de filas
+         */
+        let filaActual = this.filas.getE(fila)
         // es el primero
-        if(filaActual == null){
-            filaActual = new nodoE(dato)
+        if (filaActual == null) {
+            filaActual = new NodoE(fila)
             filaActual.acceso = nuevo
             this.filas.setE(filaActual)
-        }
-    }
-}
+        } else {
+            // va al inicio
+            if (nuevo.columna < filaActual.acceso.columna) {
+                nuevo.derecha = filaActual.acceso
+                filaActual.acceso.izquierda = nuevo
+                filaActual.acceso = nuevo
+            } else {
+                // va en medio
+                let actual = filaActual.acceso
+                while (actual.derecha != null) {
+                    if (nuevo.columna < actual.derecha.columna) {
+                        nuevo.derecha = actual.derecha
+                        actual.derecha.izquierda = nuevo
+                        nuevo.izquierda = actual
+                        actual.derecha = nuevo
 
-///// tema 2
-let tareas = 4394      
-let dias =[55 ,24, 61, 75 ,86 ,6, 49]
-let dia = "";
-//console.log(dias.length)
-while(tareas >0){
-
-
-  for(let i = 0; i<dias.length; i++){
-    
-    tareas -= dias[i]
-    //console.log(tareas)
-    if(tareas <101){
-        console.log(tareas+" - "+i )
-    }
-    if(tareas <=0 ){
-      dia = i
-      //console.log(tareas)
-      console.log("dia "+i)
-      break
-    }
-  }
-}
-
-//////// tema 1
-//ab(1,2)
-let aa = 1
-let bb = 2
-let removidos=0;
-let colas = []
-colas.unshift(aa)
-for(let i = 0; i<colas.length;i++){
-    let actual = colas.shift()
-    removidos--
-    console.log(actual+" actuales")
-    if(actual == bb){
-        console.log("iguales")
-        break
-    }else{
-        console.log("iteracion "+ i)
-        colas.unshift(aa-1)
-        colas.unshift(aa+1)
-    }
-}
-console.log(removidos +"  removidso")
-
-
-
-let lista = [17, 10, 12, 7, 11]
-let n, i, k, aux;
-    n = lista.length;
-    console.log(lista); // Mostramos, por consola, la lista desordenada
-    // Algoritmo de burbuja
-    for (k = 1; k < n; k++) {
-        for (i = 4; i < (n - k); i++) {
-            if (lista[i] > lista[i + 1]) {
-                aux = lista[i];
-                lista[i] = lista[i + 1];
-                lista[i + 1] = aux;
+                    }
+                    actual = actual.derecha
+                }
+                // va al final
+                if (actual.derecha == null) {
+                    actual.derecha = nuevo
+                    nuevo.izquierda = actual
+                }
             }
         }
+        /**
+         *  AGREGAR Nodo EN EL EJE DE LAS COLUMNAS
+         */
+        let columnaActual = this.columnas.getE(columna)
+        // es el primero
+        if (columnaActual == null) {
+            columnaActual = new NodoE(columna)
+            columnaActual.acceso = nuevo
+            this.columnas.setE(columnaActual)
+        } else {
+            // Va al inicio
+            if (nuevo.fila < columnaActual.acceso.fila) {
+                nuevo.abajo = columnaActual.acceso
+                columnaActual.acceso.arriba = nuevo
+                columnaActual.acceso = nuevo
+            } else {
+                // va en el medio
+                let actual = columnaActual.acceso
+                while (actual.abajo != null) {
+                    if (nuevo.fila < actual.abajo.fila) {
+                        nuevo.abajo = actual.abajo
+                        actual.abajo.arriba = nuevo
+                        nuevo.arriba = actual
+                        actual.abajo = nuevo
+                        break
+                    }
+                    actual = actual.abajo
+                }
+                // va al final
+                if (actual.abajo == null) {
+                    actual.abajo = nuevo
+                    nuevo.arriba = actual
+                }
+            }
+        }
+
     }
 
-console.log(lista)
+    printFilas() {
+        this.textAux = "VALORES  DE LA  MATRIZ POR FILAS\n"
+        let filass = 0
+        let aaa = ""
 
-
-function r1(a,b){
-    if(a == 0){
-        return 0
+        let filaActual = this.filas.primero
+        while (filaActual != null) {
+            aaa = "|| "
+            let NodoActual = filaActual.acceso
+            while (NodoActual != null) {
+                this.textAux += "  " + NodoActual.valor
+                aaa += "  " + NodoActual.valor
+                NodoActual = NodoActual.derecha
+            }
+            console.log(aaa)
+            filass++;
+            filaActual = filaActual.siguiente
+        }
+        //document.write(res+ "\nfilas :"+filas)
+        console.log(this.textAux)//+ "\nfilas :" + filas
     }
-    return b+r1(a-1,b-1)
+
+
+
+    printColumnas() {
+        this.textAux = "VALORES  DE LA  MATRIZ POR columnas\n"
+        let filass = 0
+        let aaa = ""
+
+        let columnaActual = this.columnas.primero
+        while (columnaActual != null) {
+            aaa = "|| "
+            let NodoActual = columnaActual.acceso
+            while (NodoActual != null) {
+                this.textAux += "  " + NodoActual.valor
+                aaa += "  " + NodoActual.valor
+                NodoActual = NodoActual.abajo
+            }
+            console.log(aaa)
+            filass++;
+            columnaActual = columnaActual.siguiente
+        }
+        //document.write(res+ "\nfilas :"+filas)
+        console.log(this.textAux)//+ "\nfilas :" + filas
+    }
 }
 
-console.log("r1 "+r1(1,0))
+
+let ss = new Matriz()
+function testMatriz() {
+
+    let apr = " --- "
+    for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+            apr += " " + i + "|" + j
+            ss.insertar(i, j, "F" + i + "C" + j)
+        }
+        apr += "\n ----"
+    }
+    console.log(apr)
+
+    ss.printFilas()
+
+    ss.printColumnas()
+}
+
+testMatriz()
+//export {Matriz}
