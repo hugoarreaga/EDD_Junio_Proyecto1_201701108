@@ -3,10 +3,15 @@
 //////////////////////////////////////////          MATRIZ ORTOGONAL /DISPERSA
 //////////////////////////////////////////
 class Nodo {
-    constructor(fila, columna, valor) {
+    constructor(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria) {
+        this.isbn = isbn
+        this.nombreAutor = nombre_autor
+        this.nombreLibro = nombre_libro;
+        this.cantidad = cantidad
         this.fila = fila;
         this.columna = columna;
-        this.valor = valor;
+        this.paginas = paginas
+        this.categoria = categoria
         this.derecha = null;
         this.izquierda = null;
         this.arriba = null;
@@ -88,6 +93,7 @@ class Matriz {
         this.textAux = "";
         this.size = 0;
         this.size2 = 0;
+        this.ortogonal = false
     }
     getNode(fila, columna) {
         let cFila = this.filas.primero;
@@ -103,9 +109,44 @@ class Matriz {
         }
         return null
     }
+    /**
+     * RELLENAR LOS DATOS PARA UNA MATRIZ ORTOGONAL
+     * @param {*} isbn 
+     * @param {*} nombre_autor 
+     * @param {*} nombre_libro 
+     * @param {*} cantidad 
+     * @param {*} fila 
+     * @param {*} columna 
+     * @param {*} paginas 
+     * @param {*} categoria 
+     */
+    insertarLleno(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria) {
+        let actual = this.getNode(fila, columna)
+        actual.isbn = isbn
+        actual.nombreAutor = nombre_autor
+        actual.nombreLibro = nombre_libro;
+        actual.cantidad = cantidad
+        actual.fila = fila;
+        actual.columna = columna;
+        actual.paginas = paginas
+        actual.categoria = categoria
 
-    insertar(fila, columna, valor) {
-        let nuevo = new Nodo(fila, columna, valor);
+    }
+
+    /**
+     * INSERTAR NUEVOS DATOS PARA UNA MATRIZ DISPERSA
+     * @param {*} isbn 
+     * @param {*} nombre_autor 
+     * @param {*} nombre_libro 
+     * @param {*} cantidad 
+     * @param {*} fila 
+     * @param {*} columna 
+     * @param {*} paginas 
+     * @param {*} categoria 
+     * @returns 
+     */
+    insertar(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria) {
+        let nuevo = new Nodo(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria);
 
         /// agregar metodo de nodos repetidos
         if (this.getNode(fila, columna)) {
@@ -183,13 +224,21 @@ class Matriz {
 
     }
 
+    rellenar() {
+        for (let i = 1; i <= 25; i++) {
+            for (let j = 1; j <= 25; j++) {
+                this.insertar("", "", "", "", i, j, "", "")
+            }
+        }
+    }
+
     recorrerFilas() {
         this.textAux = "DATOS POR FILAS:\n";
         let cFila = this.filas.primero;
         while (cFila != null) {
             let actual = cFila.acceso;
             while (actual != null) {
-                this.textAux += " - " + actual.valor;
+                this.textAux += " - " + actual.nombreLibro;
                 actual = actual.derecha;
             }
             this.textAux += "\n";
@@ -205,7 +254,7 @@ class Matriz {
         while (cColumna != null) {
             let actual = cColumna.acceso
             while (actual != null) {
-                this.textAux += "  " + actual.valor
+                this.textAux += "  " + actual.nombreLibro
                 actual = actual.abajo
 
             }
@@ -215,12 +264,70 @@ class Matriz {
         console.log(this.textAux)
     }
 
+    /**
+     * GENERAR UNA LISTA DE LIBROS MOSTRANDO LA COLA DE DISPONIBILIDAD
+     */
+    graphivzPilas() {
+        this.auxText = "digraph G{\n\n\tlabel=\" Pila de Ejemplares \" bgcolor=\"none\";\n"
+        this.auxText += "\tnodesep = 0.25\n\t/*DATOS DE LOS NODOS*/\n"
+        
+        this.auxText += "\t\tedge [ style=invis];\n\tnode [style=filled,color=\"black\" fillcolor = \"paleturquoise\" shape=plaintext];\n\tranksep = 0;\n"
+        // DATOS NODOS
+        let datosNodos = "\t/* DATOS DE LOS NODOS*/"
+        let datosRela = "\t/* DATOS DE LAS RELACIONES*/"
+        let cFila = this.filas.primero;
+        let numBook = 0
+        while (cFila != null) {
+            let actual = cFila.acceso;
+            while (actual != null) {
+                datosNodos += "\tT" + numBook + " [label = \"" + actual.nombreLibro + "\"]\n"
+                datosNodos += "\C" + numBook + " [label = \"Cantidad: " + actual.cantidad + "\"]\n"
+                let nodotabla = "\tP" + numBook + " [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\t"
+                for (let i = 1; i <= actual.cantidad; i++) {
+                    nodotabla += "\t<TR><TD>Ejemplar: " + i + "</TD></TR>\n"
+                }
+                nodotabla += "\t</TABLE>>];\n" /// cerrar tabla individual
+                //nodosPila += nodotabla + "\n"    // unir tablas
+
+                datosRela += "\tT" + numBook + " -> P" + numBook + " -> C" + numBook + "\n"
+                datosNodos += nodotabla
+                numBook++
+                actual = actual.derecha;
+            }
+            cFila = cFila.siguiente;
+        }
+
+        this.auxText += datosNodos +"\n"
+        this.auxText += datosRela + "\n}"
+        //console.log(this.auxText)
+        d3.select("#pilaLibros").graphviz()
+                .width(950)
+                .height(800)
+                .renderDot(this.auxText)
+    }
+    /**
+     * GRAFICAR EL ARCHIVO DOT DE LA MATRIZ
+     */
     graphivz() {
-        this.auxText = "digraph G{\n\n\tlabel=\" Desde Primero \" bgcolor=\"none\";\n"
+        let label = ""
+        if (this.ortogonal == true) {
+            label = "ORTOGONAL"
+        } else if (this.ortogonal == false) {
+            label = "DISPERSA"
+        }
+
+        if(this.filas == null){
+            console.log("filas vacias")
+            return
+        }else if( this.filas.primero == null){
+            console.log("nodos internos vacios")
+            return
+        }
+        this.auxText = "digraph G{\n\n\tlabel=\" " + label + " \" bgcolor=\"none\";\n"
         this.auxText += "\tedge [dir = both arrowsize=0.5];\n\tnode [style = filled color = skyblue shape=square];\nranksep = 0.25;\n"
 
         this.auxText += "\tSize [ group = 0 label = \"" + this.size + "+" + this.size2 + "\"]\n"
-        this.auxText += "\tSize -> F" + this.filas.primero.id + "\n"
+        this.auxText += "\tSize -> F" + this.filas.primero.id + "\n" 
         this.auxText += "\tSize -> C" + this.columnas.primero.id + "\n"
         /**
          * DEFINICION DE LOS NODOS DE TIPO EJE
@@ -238,8 +345,6 @@ class Matriz {
             datosVectores += "\tC" + cColumna.id + " [group = " + cColumna.id + " ];\n"
             cColumna = cColumna.siguiente
         }
-
-
         /**
          * DEFINICION DE LOS NODOS INTERNOS DE LA MATRIZ
          */
@@ -249,7 +354,7 @@ class Matriz {
             let actual = cFila.acceso;
             while (actual != null) {
                 let nodoActual = "\tF" + actual.fila + "C" + actual.columna
-                datosNodos += nodoActual + " [label = \"" + actual.valor + "\" group = " + actual.columna + "];\n"
+                datosNodos += nodoActual + " [label = \"" + actual.nombreLibro + "\\n" + actual.categoria + " \" group = " + actual.columna + "];\n"
                 actual = actual.derecha;
             }
             cFila = cFila.siguiente;
@@ -279,7 +384,6 @@ class Matriz {
                 let nodoSiguiente = "\tF" + actual.abajo.fila + "C" + actual.abajo.columna
                 datosRela += nodoActual + " -> " + nodoSiguiente + " \n"
                 actual = actual.abajo
-
             }
             this.textAux += "\n<br>"
             cColumna = cColumna.siguiente
@@ -304,7 +408,6 @@ class Matriz {
             datosRela += actual + " -> " + siguiente + " \n"
             cColumna = cColumna.siguiente
         }
-
         /**
          * DEFINICION DE LOS NODOS EJES CON LOS PRIMERO DATOS
          */
@@ -325,9 +428,6 @@ class Matriz {
             datosRela += actual + " -> " + acceso + " \n"
             cColumna = cColumna.siguiente
         }
-
-
-
         /**
          * DATOS DE RANK-SAME DE TODOS LOS NODOS por filas
          */
@@ -352,11 +452,9 @@ class Matriz {
             ranksame += "}\n"
             cFila = cFila.siguiente;
         }
-
         /**
          * UNIR TODOS LOS DATOS CREADOS EN EL STRING AUXILIAR
          */
-
         this.auxText += "\t/*DATOS DE LOS VECTORES*/\n"
         this.auxText += datosVectores
         this.auxText += "\t/*DATOS DE LOS 15 NODOS*/\n"
@@ -366,38 +464,39 @@ class Matriz {
         this.auxText += "\t/*DATOS DE LAS RANK-SAME*/\n"
         this.auxText += ranksame + " \n}"
         // agregar imagen a html
-        console.log(this.auxText)
-        d3.select("#res").graphviz()
-            .width(1000)
-            .height(1000)
-            .renderDot(this.auxText)
+        //console.log(this.auxText)
+
+        if (this.ortogonal == true) {
+            d3.select("#fantasia").graphviz()
+                .width(950)
+                .height(800)
+                .renderDot(this.auxText)
+        } else if (this.ortogonal == false) {
+            d3.select("#thriller").graphviz()
+                .width(950)
+                .height(800)
+                .renderDot(this.auxText)
+        }
 
     }
 }
 
 function testM() {
     let matrix = new Matriz();
-    for (let i = 0; i < 5; i++) {
+    matrix.rellenar()  /// convertirla en ortogonal
+    for (let i = 1; i < 30; i++) {
         for (let j = 0; j < 5; j++) {
-            let rfila = Math.floor(Math.random() * 9)
-            let rcolumna = Math.floor(Math.random() * 8)
+            let rfila = Math.floor(Math.random() * 24) + 1
+            let rcolumna = Math.floor(Math.random() * 24) + 1
             if (i != j) {
-                //matrix.insertar(i,j,i+"_"+j);dsafdfs
             }
-            matrix.insertar(rfila, rcolumna, "F" + rfila + "C" + rcolumna);
+            matrix.insertarLleno("isbn", "nombre_autor", "libro:\\nF" + rfila + "C" + rcolumna, "cantidad", rfila, rcolumna, i * j, "categoria");
         }
     }
     matrix.recorrerFilas();
     matrix.recorrerColumnas()
-    matrix.graphivz()
+    matrix.graphivz(1, "ORTOGONAL")
 }
-
-testM();
-
-//export { Matriz };
-
-
-
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////          ARBOL BINARIO DE BUSQUEDA PARA AUTORES
@@ -426,7 +525,7 @@ class ArbolBinario {
         this.size = 0
         this.auxText = ""
         this.auxNode = null
-        this.auxInt=0
+        this.auxInt = 0
     }
 
     getNode(nombre) {
@@ -490,7 +589,7 @@ class ArbolBinario {
         this.printPreOrder(this.root)
         this.auxText += "\nDATOS POSTORDER\n"
         this.printPostOrder(this.root)
-        console.log("suma " +this.auxInt)
+        //console.log("suma " + this.auxInt)
         this.auxText += "\nDATOS EXAMEN\n"
         this.printPostOrder2(this.root)
         console.log(this.auxText)
@@ -509,17 +608,17 @@ class ArbolBinario {
             this.printInOrder(nodo.right)
         }
     }
-    printPostOrder(nodo,actual) {
+    printPostOrder(nodo, actual) {
         if (nodo != null) {
             this.printPreOrder(nodo.left)
             this.printPreOrder(nodo.right)
             this.auxText += " " + nodo.nombre
         }
     }
-    
+
     printPostOrder2(nodo) {
         if (nodo != null) {
-            
+
             this.printPostOrder2(nodo.left)
             this.printPostOrder2(nodo.left)
             this.auxText += " " + nodo.nombre
@@ -531,8 +630,8 @@ class ArbolBinario {
      * GRAFICAR arbo binario afds
      */
     graphviz() {
-        this.auxText = "digraph G{\n\n\tlabel=\" Arbol ABB \" bgcolor=\"lightblue\";\n"
-        this.auxText += "\tedge [ arrowsize=0.5];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=plain];\n\tranksep = 0.5;\n"
+        this.auxText = "digraph G{\n\n\tlabel=\" Arbol ABB \" bgcolor=\"none\";\n"
+        this.auxText += "\tsplines=false;\tedge [ arrowsize=0.5];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=ellipse];\n\tranksep = 0.5;\n"
         this.auxText += "\t/*DATOS DE LOS NODOS*/\n"
         this.datosNodos(this.root, "O")
         this.auxText += "\t/*DATOS DE LOS RELACIONES*/\n"
@@ -541,10 +640,10 @@ class ArbolBinario {
 
         this.auxText += "\n}"
         d3.select("#arbolabb").graphviz()
-            .width(1000)
-            .height(1000)
+            .width(950)
+            .height(800)
             .renderDot(this.auxText)
-        console.log(this.auxText)
+        //console.log(this.auxText)
 
     }
     datosNodos(nodo, nn) {
@@ -572,7 +671,7 @@ class ArbolBinario {
 
 function testTree() {
     let arb = new ArbolBinario()
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 15; i++) {
         let letras = "abcdef"//ghijklnmnopqrstuvwxyz
         let nombre = ""
         let sizeletra = Math.floor(Math.random() * 5) + 1
@@ -585,8 +684,8 @@ function testTree() {
         //console.log(rfila)
 
     }
-    console.log(arb.size + " -----------------")
-    arb.printAll()
+    //console.log(arb.size + " -----------------")
+    //arb.printAll()
     arb.graphviz()
 }
 
@@ -594,6 +693,57 @@ function testTree() {
 
 
 
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS GENERAL
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////
+//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS GENERAL
+//////////////////////////////////////////
+
+class nodoDisp {
+    constructor(nombre, libro, cantidad) {
+        this.nombre = nombre
+        this.libro = libro
+        this.cantidad = cantidad
+
+        this.primero = null
+        this.anterior = null
+    }
+}
+/**
+ * LISTA DE LIBROS PENDIENTES GENERAL
+ */
+class colaDisponibilidad {
+    constructor() {
+        this.primero = null
+        this.ultimo = null
+    }
+    getNode(nombre, libro) {
+        let actual = this.primero
+        while (actual != null) {
+            if (actual.nombre == nombre && actual.libro == libro) {
+                return actual
+            }
+            actual = actual.siguiente
+        }
+        return null
+    }
+    insertar(nombre, libro, cantidad) {
+        let nuevo = new nodoDisp(nombre, libro, cantidad)
+        let existente = this.getNode(nombre, libro)
+        if (this.primero == null) {
+            this.primero = nuevo
+        } else if (existente) {
+            existente.cantidad++
+        } else {
+            this.ultimo.siguiente = nuevo
+            nuevo.anterior = this.ultimo
+            this.ultimo = nuevo
+        }
+    }
+}
 
 //////////////////////////////////////////
 //////////////////////////////////////////
@@ -604,9 +754,16 @@ function testTree() {
 //////////////////////////////////////////          LISTA DE LIBROS
 //////////////////////////////////////////
 class NodoL {
+    /**
+     * 
+     * @param {String} nombre 
+     */
     constructor(nombre) {
         this.nombre = nombre
-        this.cantidad = 0
+        /**
+         * @param {Int} cantidad numero de libros comprados
+         */
+        this.cantidad = 1
         this.siguiente = null
         this.anterior = null
     }
@@ -615,6 +772,8 @@ class ListaL {
     constructor() {
         this.primero = null
         this.ultimo = null
+        this.cantidad = 0
+        this.auxText = ""
     }
     getnode(nombre) {
         let actual = this.primero
@@ -627,18 +786,80 @@ class ListaL {
         return null
     }
     // insertar al final
+    /**
+     * INSERTAR UN NUEVO LIBRO A LA LISTA DE USUARIOS
+     * @param {String} nombre 
+     */
     insertar(nombre) {
         let nuevo = new NodoL(nombre)
         if (this.getnode(nombre)) {
-            this.getnode(nombre).cantidad ++ // aumentar la cantidad
+            console.log(" libro repetido")
+            this.aumentar(nombre)
         } else if (this.primero == null) {
             this.primero = nuevo
             this.ultimo = nuevo
         } else {
             this.ultimo.siguiente = nuevo
-            nuevo.siguiente = this.ultimo
+            nuevo.anterior = this.ultimo
             this.ultimo = nuevo
         }
+    }
+
+    /**RETORNA LA CANTIDAD DE LIBROS CONTANDO COPIAS */
+    get_size() {
+        let size = 0
+        let actual = this.primero
+        while (actual != null) {
+            size += actual.cantidad
+            actual = actual.siguiente
+        }
+        return size
+    }
+    aumentar(nombre) {
+        let actual = this.primero
+        while (actual != null) {
+            if (actual.nombre == nombre) {
+                actual.cantidad++
+            }
+            actual = actual.siguiente
+        }
+    }
+
+    /**
+     * grapviz de lista de pilas por usuarios 
+     */
+    graphivzEjemplares() {
+        this.auxText = "digraph G{\n\n\tlabel=\" Pila de Ejemplares \" bgcolor=\"none\";\n"
+        this.auxText += "\t\tedge [ style=invis];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=plaintext];\n\tranksep = 0;\n"
+        this.auxText += "\tnodesep = 0.25\n\t/*DATOS DE LOS NODOS*/\n"
+
+        // nodos y relaciones
+        let relaciones = "\t/* RELACIONES DE LOS NODOS*/"
+        let nodosLabel = ""
+        let nodosCantidad = ""
+        let nodosPila = ""
+        let numBook = 0
+        let actual = this.primero
+        while (actual != null) {
+            nodosLabel += "\tT" + numBook + " [label = \"" + actual.nombre + "\"]\n"
+            nodosCantidad += "\C" + numBook + " [label = \"Cantidad: " + actual.cantidad + "\"]\n"
+            let nodotabla = "\tP" + numBook + " [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\t"
+            for (let i = 1; i <= actual.cantidad; i++) {
+                nodotabla += "\t<TR><TD>Ejemplar: " + i + "</TD></TR>\n"
+            }
+            nodotabla += "\t</TABLE>>];\n" /// cerrar tabla individual
+            nodosPila += nodotabla + "\n"    // unir tablas
+
+            relaciones += "\tT" + numBook + " -> P" + numBook + " -> C" + numBook + "\n"
+            numBook++
+            actual = actual.siguiente
+        }
+        this.auxText += nodosLabel + "\n"
+        this.auxText += nodosPila + "\n"
+        this.auxText += nodosCantidad + "\n}"
+
+        console.log(this.auxText)
+
     }
 }
 
@@ -701,6 +922,17 @@ class ListaUsuario {
         return null
     }
 
+    getUser(nombre, pass) {
+        let actual = this.primero
+        while (actual != null) {
+            if (actual.user == nombre && actual.pass == pass) {
+                return actual
+            }
+            actual = actual.siguiente
+        }
+        return null
+    }
+
     /** METODO PARA INSERTAR UN NUEVO USUARIO A LA LISTA
      * ESTE METODO LOS INSERTA ORDENADAMENTE
      * @param {Int} dpi 
@@ -748,9 +980,9 @@ class ListaUsuario {
      * @param {String} nombre 
      * @param {String} user
      * @param {String} correo 
+     * @param {String} rol 
+     * @param {String} pass
      * @param {Int} telefono 
-     * @param {String} direccion 
-     * @param {String} biografia 
      */
     insertar(dpi, nombre, user, correo, rol, pass, telefono) {
         let nuevo = new NodoU(dpi, nombre, user, correo, rol, pass, telefono)
@@ -778,97 +1010,122 @@ class ListaUsuario {
         }
     }
 
-    graphivzLL(){
-        if(this.primero == null || this.primero.libros.primero == null){
+    graphivzLL() {
+        if (this.primero == null) {//|| this.primero.libros.primero == null
             return//esta vacio
         }
-        this.auxText = "digraph G{\n\n\tlabel=\" Desde Primero \" bgcolor=\"none\";\n"
-        this.auxText += "\tedge [dir = both arrowsize=0.5];\n\tnode [style = filled color = skyblue];\nranksep = 0.25;\n"
+        this.auxText = "digraph G{\n\n\tlabel=\" LISTA DE LISTAS \" bgcolor=\"none\";\n\trankdir =LR\n"
+        this.auxText += "\tedge [dir = both arrowsize=0.5];\n\tnode [style = filled ];\n\tranksep = 0.25;\n"
         //this.auxText += "\tSize [ group = 0 label = \"" + this.size + "+" + this.size2 + "\"]\n"
 
         // DEFINIR NODOS
-        let nodosUsers = "\t/* NODOS USUARIOS*/\n\tnode [shape = note ]\n"
-        let nodosBooks = "\t/* NODOS ALBUMES*/\tnode [shape = component ]\n"
+        let currUser = 0
+        let nodosUsers = "\t/* NODOS USUARIOS*/\n\tnode [shape = note color =royalblue]\n"
+        let nodosBooks = "\t/* NODOS ALBUMES*/\n\tnode [shape = component color=lightgoldenrodyellow	]\n"
         let actual = this.primero
-        while(actual != null){
-            nodosUsers += "\t"+actual.dpi +" [label = \""+actual.nombre+"\"]\n"
+        while (actual != null) {
+            nodosUsers += "\tU" + currUser + " [label = \"" + actual.nombre + "\"]\n"
             let actualBook = actual.libros.primero
             let numBook = 0
-            while(actualBook != null){
-                let label = actualBook.nombre +"\\ncopias: "+actualBook.cantidad
-                nodosBooks += "\t"+actual.dpi+numBook +" [label =\""+label+"\"]\n"
+            while (actualBook != null) {
+                let label = actualBook.nombre + "\\ncopias: " + actualBook.cantidad
+                nodosBooks += "\tU" + currUser + "L" + numBook + " [label =\"" + label + "\"]\n"
                 numBook++
                 actualBook = actualBook.siguiente
             }
+            currUser++
             actual = actual.siguiente
         }
         // DEFINIR RELACIONES
+        //let lultmo = 0
+        currUser = 0
         let relaUsers = "\t/* RELACIONES USUARIOS*/\n"
         let relaBooks = "\t/* RELACIONES LIBROS*/\n"
+        let relaUsBo = "\t/* RELACIONES USUARIOS-LIBROS*/\n"
         actual = this.primero
-        while(actual.siguiente != null){
-            relaUsers += "\t"+actual.dpi +" -> "+actual.siguiente.dpi
+        while (actual.siguiente != null) {
+            relaUsers += "\tU" + currUser + " -> U" + (currUser + 1) + "\n"
             let actualBook = actual.libros.primero
             let numBook = 0
-            while(actualBook.siguiente != null){
+            if (actualBook != null) {
+                relaUsBo += "\tU" + currUser + " -> U" + currUser + "L" + numBook + " \n"
+            }
+            while (actualBook.siguiente != null) {
                 //let label = actualBook.nombre +"\\ncopias: "+actualBook.cantidad
-                relaBooks += "\t"+actual.dpi+numBook +" -> "+actual.dpi +(numBook+1) +"\n"
+                relaBooks += "\tU" + currUser + "L" + numBook + " -> U" + currUser + "L" + (numBook + 1) + "\n"
                 numBook++
+                //lultmo = numBook
                 actualBook = actualBook.siguiente
             }
+            currUser++
             actual = actual.siguiente
+        }
+        /// ultimos libros
+        let numBook = 0
+        let librof = actual.libros.primero
+        if (librof != null) {
+            relaUsBo += "\tU" + currUser + " -> U" + currUser + "L" + numBook + " \n"
+        }
+        while (librof.siguiente != null) {
+            relaBooks += "\tU" + currUser + "L" + numBook + " -> U" + currUser + "L" + (numBook + 1) + "\n"
+            numBook++
+            librof = librof.siguiente
         }
         // DEFINIR RANKSAME
         let rankUsersFull = ""
         actual = this.primero
-        while(actual != null){
-            let rankUsers = "\t{ rank-same ; " +actual.dpi
+        currUser = 0
+        while (actual != null) {
+            let rankUsers = "\t{ rank = same ; U" + currUser + " ;"
             let actualBook = actual.libros.primero
             let numBook = 0
-            while(actualBook != null){
-                rankUsers += " "+actual.dpi+numBook+" ;"
+            while (actualBook != null) {
+                rankUsers += " U" + currUser + "L" + numBook + " ;"
                 numBook++
                 actualBook = actualBook.siguiente
             }
-            rankUsers +=" } \n"
+            rankUsers += " } \n"
+            currUser++
             rankUsersFull += rankUsers // unir ranksame actual al total
             actual = actual.siguiente
         }
-        
+
         // UNIR TODOS
         this.auxText += nodosUsers
         this.auxText += nodosBooks
         this.auxText += relaUsers
         this.auxText += relaBooks
+        this.auxText += relaUsBo
         this.auxText += rankUsersFull
         this.auxText += "\n}"
 
         console.log("DATOS LISTA DE LISTA")
         console.log(this.auxText)
+        d3.select("#usuariosLibros").graphviz()
+            .width(800)
+            .height(800)
+            .renderDot(this.auxText)
 
     }
 }
 
-testListList()
-function testListList(){
+//
+function testListList() {
     let aa = new ListaUsuario()
-
-    for (let i = 0; i < 15; i++) {
-        aa.insertar("dpi","nombre"+i,"user"+i,"correo","rol","password",1515)
-        let usuarioActual = aa.get_node("nombre"+i)
-
-        for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < 7; i++) {
+        let dpi = Math.floor(Math.random() * 5)
+        aa.insertar(i, "nombre" + i, "user" + i, "correo", "rol", "password", 1515)
+        let usuarioActual = aa.get_node("nombre" + i)
+        let lbs = Math.floor(Math.random() * 15) + 1
+        for (let j = 0; j < lbs; j++) {
             let ram = Math.floor(Math.random() * 5)
-
-            usuarioActual.libros.insertar("libro"+ram)
-            
+            usuarioActual.libros.insertar("libro" + ram)
         }
-        
     }
-
     aa.graphivzLL()
 }
 
+//testListList()
 
 
 ///////////////////////////////////////////////
@@ -877,13 +1134,11 @@ function testListList(){
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 
-let users = new ListaUsuario()//
 
-
+//llenar usuarios
 function fillUsers(e) {
     let str = e.target.files[0]
     if (!str) { return }
-
     let lector = new FileReader()
     lector.onload = function (e) {
         const object = JSON.parse(e.target.result)
@@ -903,17 +1158,13 @@ function fillUsers(e) {
     }
     lector.readAsText(str);
 }
-
 document.getElementById("fileUsers").addEventListener('change', fillUsers, false)    /// usuarios
 
 
-
-let autores = new ArbolBinario()
-
+// llenar autores
 function fillAutors(e) {
     let str = e.target.files[0]
     if (!str) { return }
-
     let lector = new FileReader()
     lector.onload = function (e) {
         const object = JSON.parse(e.target.result)
@@ -925,7 +1176,6 @@ function fillAutors(e) {
             let telefono = autor.telefono
             let direccion = autor.direccion
             let biografia = autor.biografia
-
             console.log(biografia)
             autores.insertar(dpi, nombre, correo, telefono, direccion, biografia)// insertar
         }
@@ -933,40 +1183,56 @@ function fillAutors(e) {
     }
     lector.readAsText(str);
 }
-
 document.getElementById("fileAutors").addEventListener('change', fillAutors, false)    /// usuarios
 
-
-
+// llenar libros
 function fillBooks(e) {
-
     let str = e.target.files[0]
     if (!str) { return }
+    if (autores.root == null) {
+        //return
+    }
 
     let lector = new FileReader()
     lector.onload = function (e) {
         const object = JSON.parse(e.target.result)
         for (const key in object) {
-            let autor = object[key]// objecto autor
-            let dpi = autor.dpi
-            let nombre = autor.nombre_autor
-            let correo = autor.correo
-            let telefono = autor.telefono
-            let direccion = autor.direccion
-            let biografia = autor.biografia
+            let libro = object[key]// objecto autor
+            let isbn = libro.isbn
+            let nombre_autor = libro.nombre_autor
+            let nombre_libro = libro.nombre_libro
+            let cantidad = libro.cantidad
+            let fila = libro.fila
+            let columna = libro.columna
+            let paginas = libro.paginas
+            let categoria = libro.categoria
 
-            console.log(biografia)
-            autores.insertar(dpi, nombre, correo, telefono, direccion, biografia)// insertar
+            if (categoria == "Fantasia") {
+                librosFan.insertarLleno(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria)
+            } else if (categoria == "Thriller") {
+                librosTh.insertar(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria)
+            }
+            librosGen.insertar(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria)
+            // insertar
         }
-        autores.graphviz()
+        librosTh.graphivz()
+        librosFan.graphivz()
+        librosGen.graphivzPilas()
     }
     lector.readAsText(str);
 
     //showBooks //llamar a actualizar libros
 }
+document.getElementById("fileBooks").addEventListener('change', fillBooks, false)    /// libros
 
-document.getElementById("fileBooks").addEventListener('change', fillBooks, false)    /// usuarios
 
+
+
+function showBooks3(){
+    librosTh.graphivz()
+    librosFan.graphivz()
+    librosGen.graphivzPilas()
+}
 
 
 /**
@@ -978,15 +1244,120 @@ function showBooks(e) {
 
 }
 
-
-
-//[50, 10, 60, 20, 70, 30, 80, 40, 90] avl
-function bin(){
-    let exmbin = new ArbolBinario()
-    let data = [ 30,50,10,5,25,15,40,35,20,45     ]
-    data.forEach(element => {
-        exmbin.insertar(1, element, 5, 6, 7, 8)
-    });
-    exmbin.printAll()
+function hideResultados() {
+    //arbolabb  usuariosLibros
+    document.getElementById("fantasia").style.display = 'none';
+    document.getElementById("thriller").style.display = 'none';
+    document.getElementById("usuariosLibros").style.display = 'none';
+    document.getElementById("arbolabb").style.display = 'none';
+    //document.getElementById("sep").style.display = 'none';
 }
-bin()
+
+function showResultados() {
+    document.getElementById("fantasia").style.display = 'block';
+    document.getElementById("thriller").style.display = 'block';
+    document.getElementById("usuariosLibros").style.display = 'block';
+    document.getElementById("arbolabb").style.display = 'block';
+    //document.getElementById("sep").style.display = 'block';
+}
+
+
+function loginUser() {
+    let user = document.getElementById("userName").value
+    let pass = document.getElementById("userPass").value
+
+    if (user == "" || pass == "") {
+        alert(user)
+        document.getElementById("userPass").value = ""
+        return
+    }
+    let actual = users.getUser(user, pass)
+
+    if (actual != null) {
+        //alert("se encontro el usuario")
+        if (actual.rol == "Administrador") {
+            alert("BIENVENIDO ADMINISTRADOR")
+            showAdmin()
+        } else {
+            alert("BIENVENIDO USUARIO \"" + actual.nombre + "\"")
+            showSelectedUser()
+        }
+    } else {
+        alert("el usuario o contraseña no existen")
+    }
+
+
+}
+
+
+function showSelectedUser() {
+    document.getElementById("logindiv").style.display = 'none'
+    document.getElementById("cargasMasivas").style.display = 'none'// bloquear carga usuarios
+}
+
+/**
+ *      MOSTRAR ELEMENTOS DE LA PAGINA PRINCIPAL
+ *      borrar cargas, resultados, compra
+ *      mostrar login, libreria
+ */
+function showHome() {
+    document.getElementById("divCargaUsers").style.display = 'none'
+    document.getElementById("divCargaAutores").style.display = 'none'
+    document.getElementById("divCargaLibros").style.display = 'none'
+    document.getElementById("logindiv").style.display = 'block'// mostrar login
+}
+
+/**
+ *      VISTA DE ADMINISTRADOR
+ */
+function showAdmin() {
+    document.getElementById("divCargaUsers").style.display = 'block'
+    document.getElementById("divCargaAutores").style.display = 'block'
+    document.getElementById("divCargaLibros").style.display = 'block'// bloquear login
+    document.getElementById("logindiv").style.display = 'none'// bloquear carga usuarios
+    showResultados()
+}
+
+function logout() {
+    showHome()
+    hideResultados()
+}
+
+/////////////////////////////////
+/////////////////////////////////   DEFINIR VARIABLES GOBLALES
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////   DEFINIR VARIABLES GOBLALES
+/////////////////////////////////
+
+
+/// LIBROS DISPONIBLES
+let librosTh = new Matriz()
+let librosFan = new Matriz()
+let librosGen = new Matriz()
+librosFan.ortogonal = true
+librosFan.rellenar()
+
+/// LISTADO USUARIOS
+
+let users = new ListaUsuario()//
+// INSERTAR PRIMER USUARIO *ADMIN
+users.insertar("2354168452525", "Wilfred Perez", "Wilfred", "admin@email.com", "Administrador", "123", "+502 (123) 123-4567")//
+
+/**
+ * dpi: 2354168452525
+Nombre completo: WIlfred Perez
+Nombre usuario: Wilfred
+Contraseña: 123
+Teléfono: +502 (123) 123-4567
+ */
+
+
+/// AUTORES
+
+let autores = new ArbolBinario()
+
+
+/// 
+
+showHome()

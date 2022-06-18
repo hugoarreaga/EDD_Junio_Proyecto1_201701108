@@ -1,7 +1,45 @@
-#res {
-    background-color:violet;
+#cuerpo {
+    background-color: beige;
 }
 
-#arbolabb{
-    background-color: rgb(245, 199, 142);
+
+.resultado{
+    border-radius: 20px;
+    background-color: rgb(245, 216, 180);
+    padding: 15px;
+    margin: 15px;
+    margin-left : 30px;
+    align-items: center;
+}
+
+.cargamasiva{
+    border-radius: 30px;
+    background-color: rgb(245, 216, 180);
+    padding: 15px;
+    margin: 15px;
+    margin-left : 30px;
+}
+
+.libreria{
+    border-radius: 30px;
+    background-color: rgb(245, 180, 235);
+    padding: 15px;
+    margin: 15px;
+    margin-left : 30px;
+}
+
+h1 {
+    text-align:center;
+}
+
+#logindiv{
+    float: right;
+    border-radius: 30px;
+    background-color: rgb(245, 216, 180);
+    padding: 30px;
+    margin: 15px;
+}
+
+logoff{
+    float: right;
 }

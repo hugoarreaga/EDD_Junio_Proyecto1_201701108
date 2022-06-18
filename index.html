@@ -18,47 +18,35 @@
 
 </head>
 
-<body>
+<body id="cuerpo">
 
     <!--                    bara para navegar en tre  opciones-->
     <nav class="container  navbar navbar-expand-lg navbar-light bg-light ">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active ">
-                    <button type="button" class=" btn btn-secondary btn-lg" href="#DafdsF"> Inicio </button>
+                <li class="nav-item mr-sm-4">
+                    <button type="button" class="btn btn-outline-primary" onclick="showHome()">Pagina Principal</button>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#LIBROS">Libros</a>
+                <li class="nav-item mr-sm-4">
+                    <button type="button" class="btn btn-outline-primary" onclick="hideResultados()">Iniciar Sesion
+                        H</button>
                 </li>
-                <li class="nav-item mr-sm-2 ">
-                    <a class="nav-link " href="#DF">Disabled</a>
+                <li class="nav-item mr-sm-4">
+                    <button type="button" class="btn btn-outline-primary" onclick="showResultados()">Iniciar Sesion
+                        S</button>
                 </li>
-                <li class="nav-item  col-8 ">
-                    <a class="nav-link " href="#login">Iniciar Sesion1</a>
-                </li>
-                <li class="nav-item mr-sm-4 col-6 align-self-end ">
-                    <button type="button" class="btn btn-outline-primary">Iniciar Sesion2</button>
+                <li class="nav-item mr-sm-4">
+                    <button type="button" class="btn btn-outline-primary" onclick="showHome()">Cerrar Sesion</button>
                 </li>
             </ul>
         </div>
     </nav>
     <hr>
 
-    <!--        RESULTADOS          -->
-    <div class="d-grid gap-3 border matrix" id="res" style="background-image: url('fondom.jpg');"></div>
 
-    <div class="w-75" id="arbolabb"></div>
-
-    <div class="w-75 list-list" id="usuariosLibros"></div>
-
-    <div id="arbolabb"></div>
-
-    <!--                            DIV PARA INICIAR SESION     -->
-    <hr>
 
     <!--   TEST PARA LA CARGA DE USUARIOS -->
-    <hr>
-    <div class="bg-success bg-opacity-25 ">
+    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaUsers">
         <h2> CARGAR ARCHIVO DE USUARIOS</h2>
         <form id="uploadUsers">
             <label for="file">File to upload</label>
@@ -66,52 +54,84 @@
             <button type="button" id="enviarUsuarios">Enviar</button>
         </form>
     </div>
-
-    <!--            LISTADO DE LIBROS   -->
-    <div class=" w-25">
-        <select class="savedLibros w-25" aria-label="Default select example">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-        </select>
-    </div>
-
-
     <!--   TEST PARA LA CARGA DE AUTORES -->
-    <hr>
-    <div class="bg-success p-2 bg-opacity-25 ">
+    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaAutores">
         <h2> CARGAR ARCHIVO DE AUTORES</h2>
         <form id="uploadAutors">
             <label for="file">File to upload</label>
             <input class="" type="file" id="fileAutors" accept=".json">
-
             <button type="button" id="enviarAutors">Enviar</button>
         </form>
     </div>
-
-
-
     <!--   TEST PARA LA CARGA DE LIBROS -->
-    <hr>
-    <div class="bg-success p-2 bg-opacity-25 ">
+    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaLibros">
         <h2> CARGAR ARCHIVO DE LIBROS</h2>
         <form id="uploadBooks">
             <label for="file">File to upload</label>
             <input class="" type="file" id="fileBooks" accept=".json">
-
-            <button type="button" id="enviarAutors">Enviar</button>
+            <button type="button" id="enviarBooks" onclick="showBooks3()">Mostrar3</button>
         </form>
     </div>
 
 
-    <!--   SCRIPTS DE LAS OPEREACIONES Y GRAFICAS  -->
 
+
+
+    <!--       DIV PARA INICIAR SESION     -->
+    <div class="bg-success bg-opacity-25 w-20" id="logindiv">
+        <h3> INICIAR SESION</h3>
+        <label for="name"> Nombre de Usuario</label><br>
+        <input type="text" id="userName" placeholder="User Name"><br>
+        <label for="password"> Contraseña</label><br>
+        <input type="password" name="passwordUser" id="userPass" placeholder="password"><br>
+        <button onclick="loginUser()">Ingresar</button><br>
+    </div>
+
+    <!--        RESULTADOS   GRAFICADOS       -->
+    <div class="d-grid gap-3 w-75 border resultado " id="thriller">
+        <H1>LIBROS THRILLER</H1>
+    </div>
+    <div class="d-grid gap-3 w-75 resultado " id="fantasia">
+        <H1>LIBROS FANTASIA</H1>
+    </div>
+    <div class="gap-3 w-75 resultado" id="arbolabb">
+        <h1>ARBOL ABB AUTORES</h1>
+    </div>
+    <div class="w-75 gap-3 resultado" id="usuariosLibros">
+        <H1>LISTA DE LISTAS (USUARIOS,LIBROS)</H1>
+    </div>
+    <div id="pilaLibros" class="resultado w-75 gap-3">
+        <h1>LISTA DE EJEMPLARES DISPONIBLES</h1>
+    </div>
+
+
+
+
+
+    <!--        APARTADO DE COMPRA      -->
+    <!--        COMPRA DE LIBROS        -->
+    <div class="libreria w-75">
+        compra de libros
+    </div>
+
+
+
+
+    <!--        APARTADO DE LIBRERIA GENERAL-->
+    <div class="libreria w-75">
+        representacion de libros
+    </div>
+
+
+
+
+
+
+
+    <!--   SCRIPTS DE LAS OPEREACIONES Y GRAFICAS  -->
     <script src="//d3js.org/d3.v5.min.js"></script>
     <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
     <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
-
-
     <script src="orto2.js" type="text/javascript"></script>
 </body>
 
