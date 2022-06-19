@@ -22,8 +22,8 @@
 
     <!--                    bara para navegar en tre  opciones-->
     <nav class="container  navbar navbar-expand-lg navbar-light bg-light ">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+        
+            <ul class="navbar-nav ">
                 <li class="nav-item mr-sm-4">
                     <button type="button" class="btn btn-outline-primary" onclick="showHome()">Pagina Principal</button>
                 </li>
@@ -38,8 +38,12 @@
                 <li class="nav-item mr-sm-4">
                     <button type="button" class="btn btn-outline-primary" onclick="showHome()">Cerrar Sesion</button>
                 </li>
+
+                
+                <li class="nav-item mr-sm-4 manuales">
+                    <button type="button" class="btn btn-outline-primary" onclick="showdocu()">MANUALES</button>
+                </li>
             </ul>
-        </div>
     </nav>
     <hr>
 
@@ -124,6 +128,15 @@
 
 
 
+    <!--        APARTADO DE LIBRERIA GENERAL-->
+    <div class="libreria w-75 docu" id="docu">
+        <h2>MANUAL DE USUARIO</h2>
+        <iframe src="USUARIO.pdf" width="100%" height="500px">
+        </iframe>
+        <h2>MANUAL DE TECNICO</h2>
+        <iframe src="USUARIO.pdf" width="100%" height="500px">
+        </iframe>
+    </div>
 
 
 

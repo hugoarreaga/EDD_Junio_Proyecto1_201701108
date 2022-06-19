@@ -32,6 +32,10 @@ h1 {
     text-align:center;
 }
 
+h2 {
+    text-align: center;
+}
+
 #logindiv{
     float: right;
     border-radius: 30px;
@@ -41,5 +45,9 @@ h1 {
 }
 
 logoff{
+    float: right;
+}
+
+.manuales{
     float: right;
 }

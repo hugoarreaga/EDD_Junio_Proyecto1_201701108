@@ -1288,7 +1288,16 @@ function loginUser() {
 
 
 }
+function showdocu(){
+    if(showdocuB == false){
+        document.getElementById("docu").style.display = 'block'
+        showdocuB = true
+    }else{
+        document.getElementById("docu").style.display = 'none'
+        showdocuB = false
 
+    }
+}
 
 function showSelectedUser() {
     document.getElementById("logindiv").style.display = 'none'
@@ -1301,6 +1310,9 @@ function showSelectedUser() {
  *      mostrar login, libreria
  */
 function showHome() {
+    
+    document.getElementById("docu").style.display = 'none'
+
     document.getElementById("divCargaUsers").style.display = 'none'
     document.getElementById("divCargaAutores").style.display = 'none'
     document.getElementById("divCargaLibros").style.display = 'none'
@@ -1330,6 +1342,8 @@ function logout() {
 /////////////////////////////////   DEFINIR VARIABLES GOBLALES
 /////////////////////////////////
 
+//
+let showdocuB = false
 
 /// LIBROS DISPONIBLES
 let librosTh = new Matriz()
