@@ -109,6 +109,21 @@ class Matriz {
         }
         return null
     }
+
+    getNodebyIsbn(isbn) {
+        let cFila = this.filas.primero;
+        while (cFila != null) {
+            let actual = cFila.acceso;
+            while (actual != null) {
+                if (actual.isbn == isbn) {
+                    return actual
+                }
+                actual = actual.derecha;
+            }
+            cFila = cFila.siguiente;
+        }
+        return null
+    }
     /**
      * RELLENAR LOS DATOS PARA UNA MATRIZ ORTOGONAL
      * @param {*} isbn 
@@ -268,9 +283,13 @@ class Matriz {
      * GENERAR UNA LISTA DE LIBROS MOSTRANDO LA COLA DE DISPONIBILIDAD
      */
     graphivzPilas() {
+        if (this.filas.primero == null) {
+            alert("aun no se han cargado libros")
+            return
+        }
         this.auxText = "digraph G{\n\n\tlabel=\" Pila de Ejemplares \" bgcolor=\"none\";\n"
         this.auxText += "\tnodesep = 0.25\n\t/*DATOS DE LOS NODOS*/\n"
-        
+
         this.auxText += "\t\tedge [ style=invis];\n\tnode [style=filled,color=\"black\" fillcolor = \"paleturquoise\" shape=plaintext];\n\tranksep = 0;\n"
         // DATOS NODOS
         let datosNodos = "\t/* DATOS DE LOS NODOS*/"
@@ -297,13 +316,13 @@ class Matriz {
             cFila = cFila.siguiente;
         }
 
-        this.auxText += datosNodos +"\n"
+        this.auxText += datosNodos + "\n"
         this.auxText += datosRela + "\n}"
         //console.log(this.auxText)
         d3.select("#pilaLibros").graphviz()
-                .width(950)
-                .height(800)
-                .renderDot(this.auxText)
+            .width(950)
+            .height(800)
+            .renderDot(this.auxText)
     }
     /**
      * GRAFICAR EL ARCHIVO DOT DE LA MATRIZ
@@ -316,18 +335,15 @@ class Matriz {
             label = "DISPERSA"
         }
 
-        if(this.filas == null){
-            console.log("filas vacias")
-            return
-        }else if( this.filas.primero == null){
-            console.log("nodos internos vacios")
+        if (this.filas.primero == null) {
+            alert("aun no se han cargado libros")
             return
         }
         this.auxText = "digraph G{\n\n\tlabel=\" " + label + " \" bgcolor=\"none\";\n"
         this.auxText += "\tedge [dir = both arrowsize=0.5];\n\tnode [style = filled color = skyblue shape=square];\nranksep = 0.25;\n"
 
         this.auxText += "\tSize [ group = 0 label = \"" + this.size + "+" + this.size2 + "\"]\n"
-        this.auxText += "\tSize -> F" + this.filas.primero.id + "\n" 
+        this.auxText += "\tSize -> F" + this.filas.primero.id + "\n"
         this.auxText += "\tSize -> C" + this.columnas.primero.id + "\n"
         /**
          * DEFINICION DE LOS NODOS DE TIPO EJE
@@ -528,9 +544,25 @@ class ArbolBinario {
         this.auxInt = 0
     }
 
+    getNodeDpi(dpi){
+        this.auxNode = null
+        this._getNodeDpi(this.root, dpi)
+        return this.auxNode
+    }
+    _getNodeDpi(nodo,dpi){
+        if (nodo != null) {
+            if (nodo.dpi == dpi) {
+                this.auxNode = nodo
+            }
+            this._getNodeDpi(nodo.left,dpi)
+            this._getNodeDpi(nodo.right,dpi)
+        }
+        
+    }
+
     getNode(nombre) {
         this.auxNode = null
-        this.getNode(this.root, nombre)
+        this.getNode2(this.root, nombre)
         return this.auxNode
     }
     getNode2(nodo, nombre) {
@@ -627,9 +659,14 @@ class ArbolBinario {
 
 
     /**
-     * GRAFICAR arbo binario afds
+     * GRAFICAR arbo binario autores
      */
     graphviz() {
+
+        if (this.root == null) {
+            alert("Aun no se han cargado autores")
+            return
+        }
         this.auxText = "digraph G{\n\n\tlabel=\" Arbol ABB \" bgcolor=\"none\";\n"
         this.auxText += "\tsplines=false;\tedge [ arrowsize=0.5];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=ellipse];\n\tranksep = 0.5;\n"
         this.auxText += "\t/*DATOS DE LOS NODOS*/\n"
@@ -639,8 +676,8 @@ class ArbolBinario {
 
 
         this.auxText += "\n}"
-        d3.select("#arbolabb").graphviz()
-            .width(950)
+        d3.select("#arbolabb1").graphviz()
+            .width(900)
             .height(800)
             .renderDot(this.auxText)
         //console.log(this.auxText)
@@ -695,18 +732,20 @@ function testTree() {
 
 //////////////////////////////////////////
 //////////////////////////////////////////
-//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS GENERAL
+//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS pendientes usuariso
 //////////////////////////////////////////
 //////////////////////////////////////////
 //////////////////////////////////////////
-//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS GENERAL
-//////////////////////////////////////////
+//////////////////////////////////////////          COLA DISPONIBILIDAD DE LIBROS usuarios/general
+//////////////////////////////////////////          ***PENDIENTES
 
 class nodoDisp {
-    constructor(nombre, libro, cantidad) {
+    constructor(nombre, isbn,libro,user) {
         this.nombre = nombre
+        this.user = user
+        this.isbn = isbn
         this.libro = libro
-        this.cantidad = cantidad
+        this.cantidad = 1
 
         this.primero = null
         this.anterior = null
@@ -720,6 +759,17 @@ class colaDisponibilidad {
         this.primero = null
         this.ultimo = null
     }
+
+    getBookisbn(isbn){
+        let actual = this.primero
+        while (actual != null) {
+            if (actual.isbn == isbn) {
+                return actual
+            }
+            actual = actual.siguiente
+        }
+        return null
+    }
     getNode(nombre, libro) {
         let actual = this.primero
         while (actual != null) {
@@ -730,11 +780,18 @@ class colaDisponibilidad {
         }
         return null
     }
-    insertar(nombre, libro, cantidad) {
-        let nuevo = new nodoDisp(nombre, libro, cantidad)
+    /**
+     * 
+     * @param {*} nombre Autor del libro
+     * @param {*} isbn ISBN del libro
+     * @param {*} libro Nombre del libro
+     */
+    insertar(nombre,isbn, libro) {
+        let nuevo = new nodoDisp(nombre,isbn, libro)
         let existente = this.getNode(nombre, libro)
         if (this.primero == null) {
             this.primero = nuevo
+            this.ultimo = nuevo
         } else if (existente) {
             existente.cantidad++
         } else {
@@ -742,6 +799,66 @@ class colaDisponibilidad {
             nuevo.anterior = this.ultimo
             this.ultimo = nuevo
         }
+    }
+    /**RETORNA STRING DE GRAPHVZ PARA LOS PENDIENTES */
+    graphivz(){
+        this.auxText = "digraph G{\n\n\tlabel=\" Pila de Ejemplares \" bgcolor=\"none\";\n"
+        this.auxText += "\t\tedge [ ];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=plaintext];\n\tranksep = 0;\n"
+        this.auxText += "\tnodesep = 0.5\n\t/*DATOS DE LOS NODOS*/\n"
+
+        // nodos y relaciones
+        let relaciones = "\t/* RELACIONES DE LOS NODOS*/"
+        let nodosLabel = ""
+        let nodosCantidad = ""
+        let nodosPila = ""
+        let numBook = 0
+        let actual = this.primero
+        while (actual != null) {
+            nodosLabel += "\tT" + numBook + " [label = \"" + actual.libro + "\"]\n"
+            nodosCantidad += "\C" + numBook + " [label = \"Cantidad: " + actual.cantidad + "\"]\n"
+            let nodotabla = "\tP" + numBook + " [label=<<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">\t"
+            for (let i = 1; i <= actual.cantidad; i++) {
+                nodotabla += "\t<TR><TD>Ejemplar: " + i + "</TD></TR>\n"
+            }
+            nodotabla += "\t</TABLE>>];\n" /// cerrar tabla individual
+            nodosPila += nodotabla + "\n"    // unir tablas
+
+            relaciones += "\tT" + numBook + " -> P" + numBook + " -> C" + numBook + "\n"
+            numBook++
+            actual = actual.siguiente
+        }
+        this.auxText += nodosLabel + "\n"
+        this.auxText += nodosPila + "\n"
+        this.auxText += nodosCantidad + "\n"
+        this.auxText += relaciones + "\n}"
+        console.log(this.auxText)
+        return this.auxText
+    }
+
+    graphivzPila(){
+        this.auxText = "digraph G{\n\n\tlabel=\" Pila de Ejemplares \" bgcolor=\"none\";\n"
+        this.auxText += "\t\tedge [ ];\n\tnode [style=filled,color=\".7 .3 1.0\" shape=plaintext];\n\tranksep = 0;\n"
+        this.auxText += "\tnodesep = 0.5\n\t/*DATOS DE LOS NODOS*/\n"
+
+        // nodos y relaciones
+        let relaciones = "\t/* RELACIONES DE LOS NODOS*/"
+        let nodosLabel = "\t/* DEFINICION DE LOS NODOS*/"
+        let nodosCantidad = ""
+        let nodosPila = ""
+        
+        let numBook = 0
+        let actual = this.primero
+        while (actual != null) {
+            let label = "Nombre: "+actual.nombre
+            numBook++
+            actual = actual.siguiente
+        }
+        this.auxText += nodosLabel + "\n"
+        this.auxText += nodosPila + "\n"
+        this.auxText += nodosCantidad + "\n"
+        this.auxText += relaciones + "\n}"
+        console.log(this.auxText)
+        return this.auxText
     }
 }
 
@@ -764,6 +881,7 @@ class NodoL {
          * @param {Int} cantidad numero de libros comprados
          */
         this.cantidad = 1
+        this.id = 0
         this.siguiente = null
         this.anterior = null
     }
@@ -792,16 +910,21 @@ class ListaL {
      */
     insertar(nombre) {
         let nuevo = new NodoL(nombre)
-        if (this.getnode(nombre)) {
-            console.log(" libro repetido")
+        if (this.getnode(nombre)) {// libro repetido
             this.aumentar(nombre)
         } else if (this.primero == null) {
+            nuevo.id = 1
             this.primero = nuevo
-            this.ultimo = nuevo
         } else {
-            this.ultimo.siguiente = nuevo
-            nuevo.anterior = this.ultimo
-            this.ultimo = nuevo
+
+            let actual = this.primero
+            while (actual.siguiente != null) {
+                actual = actual.siguiente
+            }
+            nuevo.id = actual.id + 1
+            actual.siguiente = nuevo
+            nuevo.anterior = actual
+
         }
     }
 
@@ -821,6 +944,14 @@ class ListaL {
             if (actual.nombre == nombre) {
                 actual.cantidad++
             }
+            actual = actual.siguiente
+        }
+    }
+
+    prtin() {
+        let actual = this.primero
+        while (actual != null) {
+            console.log("Libro: " + actual.nombre)
             actual = actual.siguiente
         }
     }
@@ -858,7 +989,7 @@ class ListaL {
         this.auxText += nodosPila + "\n"
         this.auxText += nodosCantidad + "\n}"
 
-        console.log(this.auxText)
+        return this.auxText
 
     }
 }
@@ -884,8 +1015,10 @@ class NodoU {
         this.correo = correo
         this.rol = rol
         this.pass = pass
+        this.id = 0
         this.telefono = telefono
         this.libros = new ListaL()
+        this.pendientes = new colaDisponibilidad()
 
         this.siguiente = null
         this.anterior = null
@@ -900,6 +1033,19 @@ class ListaUsuario {
         this.usuarioActual = null // login
     }
 
+    getTotalBooks() {
+        let total = 0
+        let actual = this.primero
+        while (actual != null) {
+            let bactual = actual.libros.primero
+            while (bactual != null) {
+                total++
+                bactual = bactual.siguiente
+            }
+            actual = actual.siguiente
+        }
+        return total
+    }
     existUser(nombre) {
         let exist = false
         let actual = this.primero
@@ -989,11 +1135,17 @@ class ListaUsuario {
         if (this.existUser(nombre)) {
             // ya existe
         } else if (this.primero == null) {
+            nuevo.id = 1
             this.primero = nuevo
             this.ultimo = nuevo
         } else {
-            this.ultimo.siguiente = nuevo
-            nuevo.anterior = this.ultimo
+            let actual = this.primero
+            while (actual.siguiente != null) {
+                actual = actual.siguiente
+            }
+            nuevo.id = actual.id + 1
+            actual.siguiente = nuevo
+            nuevo.anterior = actual
             this.ultimo = nuevo
         }
     }
@@ -1009,99 +1161,88 @@ class ListaUsuario {
             actual = actual.siguiente
         }
     }
-
+    /** GRAFICAR LISTA DE LISTAS (USUARIOS-LIBROS)*/
     graphivzLL() {
         if (this.primero == null) {//|| this.primero.libros.primero == null
+            alert("aun no existen usuarios")
             return//esta vacio
+        }
+
+        if (this.getTotalBooks() == 0) {
+            alert("aun no hay ningun libro")
+            return
         }
         this.auxText = "digraph G{\n\n\tlabel=\" LISTA DE LISTAS \" bgcolor=\"none\";\n\trankdir =LR\n"
         this.auxText += "\tedge [dir = both arrowsize=0.5];\n\tnode [style = filled ];\n\tranksep = 0.25;\n"
-        //this.auxText += "\tSize [ group = 0 label = \"" + this.size + "+" + this.size2 + "\"]\n"
 
-        // DEFINIR NODOS
-        let currUser = 0
-        let nodosUsers = "\t/* NODOS USUARIOS*/\n\tnode [shape = note color =royalblue]\n"
-        let nodosBooks = "\t/* NODOS ALBUMES*/\n\tnode [shape = component color=lightgoldenrodyellow	]\n"
-        let actual = this.primero
-        while (actual != null) {
-            nodosUsers += "\tU" + currUser + " [label = \"" + actual.nombre + "\"]\n"
-            let actualBook = actual.libros.primero
-            let numBook = 0
+        // DEFINIR NODOS USUARIOS    Y LIBROS 
+        let nodosUsers2 = "\t/* NODOS USUARIOS*/\n\tnode [shape = note color =royalblue]\n"
+        let currentUser = this.primero
+        while (currentUser != null) {
+            nodosUsers2 += "\tU" + currentUser.id + " [label = \"" + currentUser.nombre + "\"]\n"
+            let actualBook = currentUser.libros.primero
             while (actualBook != null) {
                 let label = actualBook.nombre + "\\ncopias: " + actualBook.cantidad
-                nodosBooks += "\tU" + currUser + "L" + numBook + " [label =\"" + label + "\"]\n"
-                numBook++
+                nodosUsers2 += "\tU" + currentUser.id + "L" + actualBook.id + " [label =\"" + label + "\"]\n"
                 actualBook = actualBook.siguiente
             }
-            currUser++
-            actual = actual.siguiente
+            currentUser = currentUser.siguiente
         }
-        // DEFINIR RELACIONES
-        //let lultmo = 0
-        currUser = 0
-        let relaUsers = "\t/* RELACIONES USUARIOS*/\n"
-        let relaBooks = "\t/* RELACIONES LIBROS*/\n"
-        let relaUsBo = "\t/* RELACIONES USUARIOS-LIBROS*/\n"
-        actual = this.primero
-        while (actual.siguiente != null) {
-            relaUsers += "\tU" + currUser + " -> U" + (currUser + 1) + "\n"
-            let actualBook = actual.libros.primero
-            let numBook = 0
-            if (actualBook != null) {
-                relaUsBo += "\tU" + currUser + " -> U" + currUser + "L" + numBook + " \n"
+        /** RELACIONES USUARIOS NUEVO  y con el primer libro*/
+        let relaUsers2 = "\t/* RELACIONES USUARIOS*/\n"
+        currentUser = this.primero
+        if (currentUser != null) {
+            relaUsers2 += "\tU" + currentUser.id + " -> U" + this.ultimo.id + " [constraint = false]\n"
+        }
+        while (currentUser.siguiente != null) {
+            relaUsers2 += "\tU" + currentUser.id + " -> U" + (currentUser.id + 1) + "\n"
+            currentUser = currentUser.siguiente
+        }
+        console.log(relaUsers2)
+        /** RELACIONES LIBROS NUEVO */
+        let relaBooks2 = "\t/* RELACIONES LIBROS*/\n"
+        currentUser = this.primero
+        while (currentUser != null) {
+            if (currentUser.libros.primero != null) {
+                relaBooks2 += "\tU" + currentUser.id + " -> U" + currentUser.id + "L" + currentUser.libros.primero.id + "\n"
+                let actualBook = currentUser.libros.primero
+                console.log(currentUser.nombre)
+                console.log(actualBook.nombre)
+                while (actualBook.siguiente != null) {
+                    let actual = "\tU" + currentUser.id + "L" + actualBook.id
+                    let next = " U" + currentUser.id + "L" + (actualBook.id + 1)
+                    relaBooks2 += "\t" + actual + " -> " + next + "\n"
+                    actualBook = actualBook.siguiente
+                }
             }
-            while (actualBook.siguiente != null) {
-                //let label = actualBook.nombre +"\\ncopias: "+actualBook.cantidad
-                relaBooks += "\tU" + currUser + "L" + numBook + " -> U" + currUser + "L" + (numBook + 1) + "\n"
-                numBook++
-                //lultmo = numBook
-                actualBook = actualBook.siguiente
-            }
-            currUser++
-            actual = actual.siguiente
+            currentUser = currentUser.siguiente
         }
-        /// ultimos libros
-        let numBook = 0
-        let librof = actual.libros.primero
-        if (librof != null) {
-            relaUsBo += "\tU" + currUser + " -> U" + currUser + "L" + numBook + " \n"
-        }
-        while (librof.siguiente != null) {
-            relaBooks += "\tU" + currUser + "L" + numBook + " -> U" + currUser + "L" + (numBook + 1) + "\n"
-            numBook++
-            librof = librof.siguiente
-        }
+
         // DEFINIR RANKSAME
-        let rankUsersFull = ""
-        actual = this.primero
-        currUser = 0
-        while (actual != null) {
-            let rankUsers = "\t{ rank = same ; U" + currUser + " ;"
-            let actualBook = actual.libros.primero
-            let numBook = 0
+        let rankUsersFull = "\t/*RANK-SAME DE LOS LIBROS*/\n"
+        currentUser = this.primero
+        while (currentUser != null) {
+            let rankUsers = "\t{ rank = same ; U" + currentUser.id + " ; "
+            let actualBook = currentUser.libros.primero
             while (actualBook != null) {
-                rankUsers += " U" + currUser + "L" + numBook + " ;"
-                numBook++
+                let actual = "U" + currentUser.id + "L" + actualBook.id
+                rankUsers += actual + " ; "
                 actualBook = actualBook.siguiente
             }
-            rankUsers += " } \n"
-            currUser++
-            rankUsersFull += rankUsers // unir ranksame actual al total
-            actual = actual.siguiente
+            rankUsersFull += rankUsers + " } \n"
+            currentUser = currentUser.siguiente
         }
 
         // UNIR TODOS
-        this.auxText += nodosUsers
-        this.auxText += nodosBooks
-        this.auxText += relaUsers
-        this.auxText += relaBooks
-        this.auxText += relaUsBo
+        this.auxText += nodosUsers2
+        this.auxText += relaBooks2
+        this.auxText += relaUsers2
         this.auxText += rankUsersFull
         this.auxText += "\n}"
 
-        console.log("DATOS LISTA DE LISTA")
-        console.log(this.auxText)
-        d3.select("#usuariosLibros").graphviz()
+        //console.log("DATOS LISTA DE LISTA")
+        //console.log(this.auxText)
+        d3.select("#listausuarioslibros").graphviz()
             .width(800)
             .height(800)
             .renderDot(this.auxText)
@@ -1116,7 +1257,7 @@ function testListList() {
         let dpi = Math.floor(Math.random() * 5)
         aa.insertar(i, "nombre" + i, "user" + i, "correo", "rol", "password", 1515)
         let usuarioActual = aa.get_node("nombre" + i)
-        let lbs = Math.floor(Math.random() * 15) + 1
+        let lbs = Math.floor(Math.random() * 5)
         for (let j = 0; j < lbs; j++) {
             let ram = Math.floor(Math.random() * 5)
             usuarioActual.libros.insertar("libro" + ram)
@@ -1130,7 +1271,7 @@ function testListList() {
 
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
-///////////////////////////////////////////////     TEST DE CARGAS MASIVAS
+///////////////////////////////////////////////     FUNCIONES DE CARGAS MASIVAS
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 
@@ -1160,7 +1301,6 @@ function fillUsers(e) {
 }
 document.getElementById("fileUsers").addEventListener('change', fillUsers, false)    /// usuarios
 
-
 // llenar autores
 function fillAutors(e) {
     let str = e.target.files[0]
@@ -1179,7 +1319,7 @@ function fillAutors(e) {
             console.log(biografia)
             autores.insertar(dpi, nombre, correo, telefono, direccion, biografia)// insertar
         }
-        autores.graphviz()
+        //autores.graphviz()
     }
     lector.readAsText(str);
 }
@@ -1215,9 +1355,9 @@ function fillBooks(e) {
             librosGen.insertar(isbn, nombre_autor, nombre_libro, cantidad, fila, columna, paginas, categoria)
             // insertar
         }
-        librosTh.graphivz()
-        librosFan.graphivz()
-        librosGen.graphivzPilas()
+        //librosTh.graphivz()
+        //librosFan.graphivz()
+        //librosGen.graphivzPilas()
     }
     lector.readAsText(str);
 
@@ -1225,114 +1365,355 @@ function fillBooks(e) {
 }
 document.getElementById("fileBooks").addEventListener('change', fillBooks, false)    /// libros
 
+/** VERIFICAR SI SE INGRESO UN USUARIO EXISTENTE */
+function loginUser() {
+    currentUser = null
+    let user = document.getElementById("userName").value
+    let pass = document.getElementById("userPass").value
+    document.getElementById("userPass").value = ""
+    if (user == "" || pass == "") {
+        alert("tiene campos vacios")
+        return
+    }
+    currentUser = users.getUser(user, pass)
+    if (currentUser != null) {
+        if (currentUser.rol == "Administrador") {
+            alert("BIENVENIDO ADMINISTRADOR")
+            showAdmin()
+        } else {
+            alert("BIENVENIDO USUARIO \"" + currentUser.nombre + "\"")
+            showSelectedUser()
+        }
+        fillUserData()
+    } else {
+        alert("el usuario o contraseña no existen")
+    }
+}
 
+function showdocu() {
+    if (showdocuB) {
+        document.getElementById("docu").style.display = 'none'
+        showdocuB = false
+    } else {
+        document.getElementById("docu").style.display = 'block'
+        showdocuB = true
+    }
+}
 
-
-function showBooks3(){
+function showBooks3() {//GENERAR 3 GRAPVHIZ
     librosTh.graphivz()
     librosFan.graphivz()
     librosGen.graphivzPilas()
 }
 
 
-/**
- * MOSTRAR TODOS LOS LIBROS DISPONIBLES CARGADOS
- * EN EL SELECTOR
- * -- como update cada vez que se cargan libros
- */
-function showBooks(e) {
 
-}
-
-function hideResultados() {
-    //arbolabb  usuariosLibros
-    document.getElementById("fantasia").style.display = 'none';
-    document.getElementById("thriller").style.display = 'none';
-    document.getElementById("usuariosLibros").style.display = 'none';
-    document.getElementById("arbolabb").style.display = 'none';
-    //document.getElementById("sep").style.display = 'none';
-}
 
 function showResultados() {
     document.getElementById("fantasia").style.display = 'block';
     document.getElementById("thriller").style.display = 'block';
-    document.getElementById("usuariosLibros").style.display = 'block';
+    document.getElementById("listausuarioslibros").style.display = 'none';
     document.getElementById("arbolabb").style.display = 'block';
-    //document.getElementById("sep").style.display = 'block';
 }
 
-
-function loginUser() {
-    let user = document.getElementById("userName").value
-    let pass = document.getElementById("userPass").value
-
-    if (user == "" || pass == "") {
-        alert(user)
-        document.getElementById("userPass").value = ""
-        return
-    }
-    let actual = users.getUser(user, pass)
-
-    if (actual != null) {
-        //alert("se encontro el usuario")
-        if (actual.rol == "Administrador") {
-            alert("BIENVENIDO ADMINISTRADOR")
-            showAdmin()
-        } else {
-            alert("BIENVENIDO USUARIO \"" + actual.nombre + "\"")
-            showSelectedUser()
-        }
-    } else {
-        alert("el usuario o contraseña no existen")
-    }
-
-
-}
-function showdocu(){
-    if(showdocuB == false){
-        document.getElementById("docu").style.display = 'block'
-        showdocuB = true
-    }else{
-        document.getElementById("docu").style.display = 'none'
-        showdocuB = false
-
-    }
-}
-
+/**CARGA DE USUARIO NORMAL */
 function showSelectedUser() {
     document.getElementById("logindiv").style.display = 'none'
-    document.getElementById("cargasMasivas").style.display = 'none'// bloquear carga usuarios
+    document.getElementById("optionuser").style.display = 'block'
+    document.getElementById("logout").style.display = 'block'
+    //showResultados()
 }
 
-/**
- *      MOSTRAR ELEMENTOS DE LA PAGINA PRINCIPAL
- *      borrar cargas, resultados, compra
- *      mostrar login, libreria
- */
+/**MOSTRAR ELEMENTOS DE LA PAGINA PRINCIPAL*/
 function showHome() {
-    
-    document.getElementById("docu").style.display = 'none'
+    currentUser = null
 
+    document.getElementById("arbolabb").style.display = 'none';
+    document.getElementById("fantasia").style.display = 'block'
+    document.getElementById("thriller").style.display = 'block'
+
+    document.getElementById("pilaLibros").style.display = 'none'
+    document.getElementById('listausuarioslibros').style.display = 'none'
+    document.getElementById("optionuser").style.display = 'none'
+    document.getElementById("docu").style.display = 'none'
+    document.getElementById("logout").style.display = 'none'
     document.getElementById("divCargaUsers").style.display = 'none'
     document.getElementById("divCargaAutores").style.display = 'none'
     document.getElementById("divCargaLibros").style.display = 'none'
     document.getElementById("logindiv").style.display = 'block'// mostrar login
+    document.getElementById("compralibros").style.display = 'none'
+    document.getElementById("optionadmin").style.display = 'none'
 }
 
-/**
- *      VISTA DE ADMINISTRADOR
- */
+/** VISTA DE ADMINISTRADOR */
 function showAdmin() {
+    document.getElementById("logout").style.display = 'block'
     document.getElementById("divCargaUsers").style.display = 'block'
     document.getElementById("divCargaAutores").style.display = 'block'
     document.getElementById("divCargaLibros").style.display = 'block'// bloquear login
     document.getElementById("logindiv").style.display = 'none'// bloquear carga usuarios
+
+    document.getElementById("optionadmin").style.display = 'block'
     showResultados()
+
 }
 
-function logout() {
-    showHome()
-    hideResultados()
+function fillUserData() {
+    if (currentUser.rol == "Usuario") {
+        document.getElementById('nombreUser').textContent = "Bienvenido: " + currentUser.nombre
+    } else {
+        document.getElementById('nombreAdmin').textContent = "Bienvenido: " + currentUser.nombre
+    }
+}
+function showCargaMasiva() {
+    document.getElementById("divCargaUsers").style.display = 'block'
+    document.getElementById("divCargaAutores").style.display = 'block'
+    document.getElementById("divCargaLibros").style.display = 'block'
+}
+
+function hideoptionsAdmin() {//arbolabb usuariosLibros pilaLibros topCompradores
+
+    document.getElementById("fantasia").style.display = 'none'
+    document.getElementById("thriller").style.display = 'none'
+    document.getElementById("topCompradores").style.display = 'none'
+    document.getElementById("divCargaUsers").style.display = 'none'
+    document.getElementById("divCargaAutores").style.display = 'none'
+    document.getElementById("divCargaLibros").style.display = 'none'
+    document.getElementById("arbolabb").style.display = 'none'
+    document.getElementById("listausuarioslibros").style.display = 'none'
+    document.getElementById("pilaLibros").style.display = 'none'
+    document.getElementById("compralibros").style.display = 'none'
+}
+function showLibrerias() {
+
+    document.getElementById("fantasia").style.display = 'block';
+    document.getElementById("thriller").style.display = 'block';
+    librosTh.graphivz()
+    librosFan.graphivz()
+}
+function showCompra() {
+    document.getElementById("compralibros").style.display = "block"
+
+    let fff = document.getElementById("divFantasia") 
+    fff.innerHTML = ''
+    
+    let gg = document.getElementById("shoplist") 
+    gg.innerHTML =''
+    let fff1 = document.getElementById("divThriller") 
+    fff1.innerHTML = ''
+    
+    //<h3 class="w-100 titulo">LIBRERIA DE FANTASIA</h3>
+    if (librosGen.columnas.primero == null) {
+        alert("aun no se han guardado libros")
+        return
+    }
+    let cFila = librosGen.filas.primero;
+    while (cFila != null) {
+        let actual = cFila.acceso;
+        while (actual != null) {
+            //agregar a la categoria divThriller
+            if(actual.categoria == "Thriller"){
+                addBook("divThriller",actual)
+            }else if(actual.categoria == "Fantasia"){
+                addBook("divFantasia",actual)
+            }
+            actual = actual.derecha;
+        }
+        cFila = cFila.siguiente;
+    }
+    
+}
+
+function addBook(categoria,libro){
+    let libreria = document.getElementById(`${categoria}`)
+    let libronuevo = document.createElement('div')
+    libronuevo.className = 'libronuevo'
+    libronuevo.innerHTML = `
+        <div>
+        <h4 class="titulo">${libro.nombreLibro}</h4>
+        <div class="body">
+            <p>Autor: ${libro.nombreAutor}</p>
+            <p>isbn: ${libro.isbn}</p>
+            <p>Cantidad: ${libro.cantidad}</p>
+            <button type="button" class="btn btn-outline-success" onclick="consolebook(${libro.fila},${libro.columna})">Comprar</button>
+        </div>
+        </div>  
+        `
+    libreria.append(libronuevo)
+}
+
+function consolebook(i,j){
+    let libro  = librosGen.getNode(i,j)
+    let listado = document.getElementById("shoplist")
+
+
+    let libronuevo = document.createElement('div')
+    libronuevo.className = 'libronuevo'
+    libronuevo.id = `${libro.isbn}`
+    libronuevo.innerHTML = `
+        <div>
+            <h4 class="titulo">${libro.nombreLibro}</h4>
+            <div class="body">
+                <p>Autor: ${libro.nombreAutor}</p>
+                <p>isbn: </p>
+                
+                <div id="isbn"> ${libro.isbn}</div>
+                <p>Cantidad: ${libro.cantidad}</p>
+            </div>
+        </div>  
+        `
+    listado.append(libronuevo)
+    
+
+    //console.log(libro.nombreLibro)
+}
+function restarlibrolibrerias(isbn){
+    let general = librosGen.getNodebyIsbn(isbn)
+    general.cantidad --
+    let fant = librosFan.getNodebyIsbn(isbn)
+    if(fant != null){
+        fant.cantidad --
+    }
+    let th = librosTh.getNodebyIsbn(isbn)
+    if(th != null){
+        th.cantidad --
+    }
+    
+}
+
+
+function agregarlibrosC(){
+    let listado2 = document.getElementById("shoplist")
+    let listado = document.getElementById("shoplist").children
+
+    
+
+    console.log("elementos seleccionados: "+listado.length)
+    for (let i = 0; i < listado.length; i++) {
+        let isbnactual = listado[i].id
+        let tempb = librosGen.getNodebyIsbn(isbnactual)
+
+        if(tempb.cantidad == 0){
+            // agregar a pila de espera
+            pendientes.insertar(tempb.nombreAutor,tempb.isbn, tempb.nombreLibro)
+            currentUser.pendientes.insertar(tempb.nombreAutor,tempb.isbn, tempb.nombreLibro)
+        }else{
+            restarlibrolibrerias(isbnactual)
+            currentUser.libros.insertar(tempb.nombreLibro)
+        }
+        console.log(isbnactual)
+    }
+    listado2.innerHTML  =''
+
+}
+
+function listAutores(){
+    let listado = document.getElementById("listautors")
+    listado.innerHTML  =''
+    let res = document.getElementById("specificAutor")
+    res.innerHTML = ''
+    _addAutor(autores.root,listado)
+}
+
+function _addAutor(node,div){
+    if(node != null){
+        addAutor(div,node)
+        _addAutor(node.left,div)
+        _addAutor(node.right,div)
+    }
+}
+function addAutor(listado, libro){
+    let libronuevo = document.createElement('div')
+    libronuevo.className = 'autordd'
+    libronuevo.innerHTML = `
+        <div class="autordd1">
+        <h4 class="autordd">${libro.nombre}</h4>
+        <hr>
+        <div class="body">
+            <p>DPI: ${libro.dpi}</p>
+            <p>Telefono: ${libro.telefono}</p>
+            <button type="button" class="btn btn-outline-success" onclick="specificAutor(${libro.dpi})">Mas Info</button>
+        </div>
+        </div>  
+        `
+    listado.append(libronuevo)
+}
+
+function specificAutor(libro1){
+    let libro = autores.getNodeDpi(libro1)
+    console.log(libro1)
+    console.log(libro.nombre)
+    let res = document.getElementById("specificAutor")
+    res.innerHTML = ''
+    let libronuevo = document.createElement('div')
+    libronuevo.className = 'autoractaul'
+    libronuevo.innerHTML = `
+        <div>
+        <h4 class="Nombre">${libro.nombre}</h4>
+        <hr>
+        <div class="body">
+            <p>DPI: ${libro.dpi}</p>
+            <p>Telefono: ${libro.telefono}</p>
+            <p>Correo: ${libro.correo}</p><hr>
+            <p>Direccion: ${libro.direccion}</p><hr>
+            <h3>Biografia</h3>
+            <p>${libro.biografia}</p>
+        </div>
+        </div>  
+        `
+    res.append(libronuevo)
+}
+
+
+
+
+function showpendientes(){
+    // general
+    let resultado = pendientes.graphivz()
+    
+    document.getElementById("pendientesAdmin").style.display = "block"
+    document.getElementById("pendientesUser").style.display = "block"
+    d3.select("#pendientesAdmin").graphviz()
+            .width(800)
+            .height(800)
+            .renderDot(resultado)
+
+    let res = currentUser.pendientes.graphivz()
+
+    d3.select("#pendientesUser").graphviz()
+            .width(800)
+            .height(800)
+            .renderDot(res)
+    
+}
+
+function optionsAdmin() {
+    let opcionSelected = document.getElementById("opcionesadmin").selectedIndex
+    if (opcionSelected == 0) {
+        document.getElementById("arbolabb").style.display = "block"
+        document.getElementById("arbolabb1").style.display = "block"
+        autores.graphviz()
+        listAutores()
+    } else if (opcionSelected == 1) {
+
+        showCompra()
+    } else if (opcionSelected == 2) {
+
+    } else if (opcionSelected == 3) {
+        showpendientes()
+    } else if (opcionSelected == 4) {
+        showCargaMasiva()
+    } else if (opcionSelected == 5) {
+        librosFan.graphivz()
+        librosTh.graphivz()
+    } else if (opcionSelected == 6) {
+        librosGen.graphivzPilas()
+    } else if (opcionSelected == 7) {
+        document.getElementById("listausuarioslibros").style.display = "block"
+        users.graphivzLL()
+    }
+    //console.log(opcionSelected)
+
 }
 
 /////////////////////////////////
@@ -1345,6 +1726,7 @@ function logout() {
 //
 let showdocuB = false
 
+
 /// LIBROS DISPONIBLES
 let librosTh = new Matriz()
 let librosFan = new Matriz()
@@ -1352,26 +1734,26 @@ let librosGen = new Matriz()
 librosFan.ortogonal = true
 librosFan.rellenar()
 
-/// LISTADO USUARIOS
 
+
+/// LISTADO USUARIOS
 let users = new ListaUsuario()//
-// INSERTAR PRIMER USUARIO *ADMIN
 users.insertar("2354168452525", "Wilfred Perez", "Wilfred", "admin@email.com", "Administrador", "123", "+502 (123) 123-4567")//
 
-/**
- * dpi: 2354168452525
-Nombre completo: WIlfred Perez
-Nombre usuario: Wilfred
-Contraseña: 123
-Teléfono: +502 (123) 123-4567
- */
+let admin = users.get_node("Wilfred Perez")
+admin.libros.insertar("d")
+
+let pendientes = new colaDisponibilidad() 
+// usuario actaul
+let currentUser = null
+
+//users.graphivzLL()
+
 
 
 /// AUTORES
-
 let autores = new ArbolBinario()
 
 
 /// 
-
 showHome()

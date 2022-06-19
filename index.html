@@ -22,114 +22,206 @@
 
     <!--                    bara para navegar en tre  opciones-->
     <nav class="container  navbar navbar-expand-lg navbar-light bg-light ">
-        
-            <ul class="navbar-nav ">
-                <li class="nav-item mr-sm-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="showHome()">Pagina Principal</button>
-                </li>
-                <li class="nav-item mr-sm-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="hideResultados()">Iniciar Sesion
-                        H</button>
-                </li>
-                <li class="nav-item mr-sm-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="showResultados()">Iniciar Sesion
-                        S</button>
-                </li>
-                <li class="nav-item mr-sm-4">
-                    <button type="button" class="btn btn-outline-primary" onclick="showHome()">Cerrar Sesion</button>
-                </li>
 
-                
-                <li class="nav-item mr-sm-4 manuales">
-                    <button type="button" class="btn btn-outline-primary" onclick="showdocu()">MANUALES</button>
-                </li>
-            </ul>
+        <ul class="navbar-nav ">
+            <li class="nav-item mr-sm-4">
+                <button type="button" class="btn btn-outline-primary" onclick="showHome()">Pagina Principal</button>
+            </li>
+
+            <li class="nav-item mr-sm-4">
+                <button type="button" class="btn btn-outline-primary" onclick="showLibrerias()">Actualizar Librerias</button>
+            </li>
+            <li class="nav-item mr-sm-4" id="logout">
+                <button type="button" class="btn btn-outline-danger" onclick="showHome()">Cerrar Sesion</button>
+            </li>
+
+
+            <li class="nav-item mr-sm-4 manuales">
+                <button type="button" class="btn btn-outline-primary" onclick="showdocu()">MANUALES</button>
+            </li>
+        </ul>
     </nav>
     <hr>
 
+    <!--            SEPARADOR DE ELEMENTOS-->
+    <div class="flex-container">
+        <!--ELEMENTOS DE LA IZQUIERDA-->
+        <div class="izq">
+            <!--   TEST PARA LA CARGA DE USUARIOS -->
+            <div class="  cargamasiva" id="divCargaUsers">
+                <h2> CARGAR ARCHIVO DE USUARIOS</h2>
+                <form id="uploadUsers">
+                    <label for="file">File to upload</label>
+                    <input class="" type="file" id="fileUsers" accept=".json">
+                    <button type="button" id="enviarUsuarios">Enviar</button>
+                </form>
+            </div>
+            <!--   TEST PARA LA CARGA DE AUTORES -->
+            <div class=" cargamasiva" id="divCargaAutores">
+                <h2> CARGAR ARCHIVO DE AUTORES</h2>
+                <form id="uploadAutors">
+                    <label for="file">File to upload</label>
+                    <input class="" type="file" id="fileAutors" accept=".json">
+                    <button type="button" id="enviarAutors">Enviar</button>
+                </form>
+            </div>
+            <!--   TEST PARA LA CARGA DE LIBROS -->
+            <div class= "cargamasiva" id="divCargaLibros">
+                <h2> CARGAR ARCHIVO DE LIBROS</h2>
+                <form id="uploadBooks">
+                    <label for="file">File to upload</label>
+                    <input class="" type="file" id="fileBooks" accept=".json">
+                    <button type="button" id="enviarBooks" onclick="showBooks3()">Mostrar3</button>
+                </form>
+            </div>
 
 
-    <!--   TEST PARA LA CARGA DE USUARIOS -->
-    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaUsers">
-        <h2> CARGAR ARCHIVO DE USUARIOS</h2>
-        <form id="uploadUsers">
-            <label for="file">File to upload</label>
-            <input class="" type="file" id="fileUsers" accept=".json">
-            <button type="button" id="enviarUsuarios">Enviar</button>
-        </form>
+            <!--        COMPRA DE LIBROS        -->
+            <div class="libreria   " id="compralibros">
+                <h1>LIBRERIA POR CATEGORIA</h1>
+                <h3 class="w-100 titulo">LIBRERIA DE FANTASIA</h3>
+                <div class = "fantasia flex-container" id="divFantasia">
+                    
+                </div>
+                <h3 class="w-100 titulo">LIBRERIA DE THRILLER</h3>
+                <div class="thriller flex-container" id="divThriller">
+                    
+                </div>
+
+                <div class="carrito">
+                    <h4 class="w-100 titulo"> Elementos seleccionados</h4>
+                    <div class="list flex-container" id="shoplist">
+
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" onclick="agregarlibrosC()">Confirmar Compra</button>
+                </div>
+            </div>
+
+
+            <!--        RESULTADOS   GRAFICADOS       -->
+            <div class="d-grid gap-3 resultado" id="thriller">
+                <H1>LIBROS THRILLER</H1>
+            </div>
+            <div class="d-grid gap-3 resultado" id="fantasia">
+                <H1>LIBROS FANTASIA</H1>
+            </div>
+            <div class="d-grid gap-3 resultado" id="arbolabb">
+                <h1>ARBOL ABB AUTORES</h1>
+                <div class="d-grid gap-3 resultado" id="arbolabb1">
+
+                </div>
+                <h3>LISTA DE USUARIOS</h3>
+                <div class="d-grid gap-3 flex-container resultado" id="listautors"></div>
+
+                <div class="d'grid gap-3 resultado" id="specificAutor"></div>
+            </div>
+
+            <div class="d-grid gap-3 resultado" id="listausuarioslibros">
+                <h1>LISTA DE LISTAS (USUARIOS,LIBROS df)</H1>
+            </div>
+
+            <div class="d-grid resultado gap-3" id="pilaLibros">
+                <h1>LISTA DE EJEMPLARES DISPONIBLES</h1>
+            </div>
+
+            
+            <div class="d-grid resultado gap-3" id="topCompradores">
+                <h1>TOP DE COMPRADORES</h1>
+            </div>
+
+            <!--        LIBROS PENDIENTES USER/GENERAL-->
+            <div class="d-grid resultado gap-3" id="librospendientes">
+                <h1>LIBROS PENDIENTES DEL USUARIO</h1>
+                <div id="pendientesUser"></div>
+                
+                <div id="idPendAdmin">
+                    <h1 id="">LIBROS PENDIENTES DEL GENERAL</h1>
+                    <div id="pendientesAdmin"></div>
+                    <div id="pilapendientesUser"></div>
+                </div>
+                
+            </div>
+
+
+
+
+        </div>
+
+        <!--ELEMENTOS DE LA DERECHA-->
+
+        <div class="der">
+            <!--       DIV PARA INICIAR SESION     -->
+            <div class="bg-success bg-opacity-25 derecha" id="logindiv">
+                <h3> INICIAR SESION</h3>
+                <label for="name"> Nombre de Usuario</label><br>
+                <input type="text" id="userName" placeholder="User Name"><br>
+                <label for="password"> Contraseña</label><br>
+                <input type="password" name="passwordUser" id="userPass" placeholder="password"><br>
+                <button onclick="loginUser()">Ingresar</button><br>
+            </div>
+
+
+
+            <!--       DIV PARA OPCIONES USUARIO NORMAL     -->
+            <div class=" bg-success bg-opacity-25 derecha" id="optionuser">
+                <h4> OPCIONES USUARIO</h4>
+                <h2 id="nombreUser">nombre user</h2>
+                <select class="form-select" aria-label="Default select example">
+                    <option value="1">Mostrar Librerias</option>
+                    <option value="2">Realizar Compra</option>
+                    <option value="3">Ver TOPs</option>
+                  </select>
+                <button onclick="">Ingresar</button><br>
+            </div>
+
+
+            <!--       DIV PARA OPCIONES USUARIO ADMINSITRADOR     -->
+            <div class=" bg-success bg-opacity-25 derecha" id="optionadmin">
+                <h3> OPCIONES ADMINISTRADOR</h3>
+                <h2 id="nombreAdmin">nombreuser</h2>
+                <select class="form-select" aria-label="Default select example" id="opcionesadmin">
+                    <option value="1">Mostrar Autores</option>
+                    <option value="2">Realizar Compra</option>
+                    <option value="3">Ver TOPs</option>
+                    <option value="4">Ver Libros Pendientes</option>
+                    <option value="5">Carga Masiva</option>
+                    <option value ="6">Librerias</option>
+                    <option value ="7">EJEMPLARES DISPONIBLES</option>
+                    <option value ="8">VER USUARIOS-LIBROS</option>
+                  </select>
+                <button onclick="optionsAdmin()">Seleccionar</button><br>
+                <button onclick="hideoptionsAdmin()">OcultarTodo</button><br>
+            </div>
+
+
+        </div>
+
+
     </div>
-    <!--   TEST PARA LA CARGA DE AUTORES -->
-    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaAutores">
-        <h2> CARGAR ARCHIVO DE AUTORES</h2>
-        <form id="uploadAutors">
-            <label for="file">File to upload</label>
-            <input class="" type="file" id="fileAutors" accept=".json">
-            <button type="button" id="enviarAutors">Enviar</button>
-        </form>
-    </div>
-    <!--   TEST PARA LA CARGA DE LIBROS -->
-    <div class="bg-success bg-opacity-25 w-75 cargamasiva" id="divCargaLibros">
-        <h2> CARGAR ARCHIVO DE LIBROS</h2>
-        <form id="uploadBooks">
-            <label for="file">File to upload</label>
-            <input class="" type="file" id="fileBooks" accept=".json">
-            <button type="button" id="enviarBooks" onclick="showBooks3()">Mostrar3</button>
-        </form>
-    </div>
+
+    
 
 
 
 
 
-    <!--       DIV PARA INICIAR SESION     -->
-    <div class="bg-success bg-opacity-25 w-20" id="logindiv">
-        <h3> INICIAR SESION</h3>
-        <label for="name"> Nombre de Usuario</label><br>
-        <input type="text" id="userName" placeholder="User Name"><br>
-        <label for="password"> Contraseña</label><br>
-        <input type="password" name="passwordUser" id="userPass" placeholder="password"><br>
-        <button onclick="loginUser()">Ingresar</button><br>
-    </div>
-
-    <!--        RESULTADOS   GRAFICADOS       -->
-    <div class="d-grid gap-3 w-75 border resultado " id="thriller">
-        <H1>LIBROS THRILLER</H1>
-    </div>
-    <div class="d-grid gap-3 w-75 resultado " id="fantasia">
-        <H1>LIBROS FANTASIA</H1>
-    </div>
-    <div class="gap-3 w-75 resultado" id="arbolabb">
-        <h1>ARBOL ABB AUTORES</h1>
-    </div>
-    <div class="w-75 gap-3 resultado" id="usuariosLibros">
-        <H1>LISTA DE LISTAS (USUARIOS,LIBROS)</H1>
-    </div>
-    <div id="pilaLibros" class="resultado w-75 gap-3">
-        <h1>LISTA DE EJEMPLARES DISPONIBLES</h1>
-    </div>
 
 
 
 
 
-    <!--        APARTADO DE COMPRA      -->
-    <!--        COMPRA DE LIBROS        -->
-    <div class="libreria w-75">
-        compra de libros
-    </div>
+
+
+    
 
 
 
-
-    <!--        APARTADO DE LIBRERIA GENERAL-->
-    <div class="libreria w-75">
-        representacion de libros
-    </div>
+    
 
 
 
-    <!--        APARTADO DE LIBRERIA GENERAL-->
-    <div class="libreria w-75 docu" id="docu">
+    <!--        APARTADO DE DOCUMENTACION-->
+    <div class="libreria   docu" id="docu">
         <h2>MANUAL DE USUARIO</h2>
         <iframe src="USUARIO.pdf" width="100%" height="500px">
         </iframe>
@@ -137,6 +229,10 @@
         <iframe src="USUARIO.pdf" width="100%" height="500px">
         </iframe>
     </div>
+
+
+
+
 
 
 

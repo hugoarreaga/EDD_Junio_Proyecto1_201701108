@@ -1,23 +1,72 @@
 #cuerpo {
-    background-color: beige;
+    background-color: #ffef96;
+}
+
+/*FLEX*/
+.flex-container {
+    display: flex;   
+    flex-wrap: wrap;
+}
+
+.izq {
+    width: 67%;
+}
+
+.izq > div{
+    width:  100%;
+}
+.der{
+    width: 33%;
+}
+
+/*   ELEMENTOS PARA COMPRAR*/
+#divThriller > div,#divFantasia > div ,#shoplist >div, #listautors >div{
+    width: 200px;
+    background-color: cornflowerblue;
+    border-radius: 15px;
+    margin: 10px;
+    padding: 10px;
+
+}
+
+#specificAutor{
+    width: 75%;
+    align-items: center;
 }
 
 
+.titulo{
+    text-align: center;
+    background-color: darkgray;
+    width: 100%;
+}
+
+.autoractaul, .autordd{
+    background-color:#59d07d;
+    padding: 15px;
+    border-radius: 15px;
+}
+.autordd1{
+    background-color: antiquewhite;
+    margin: 0px;
+    padding: 5px;
+}
+
+/*  ELEMENTOS PARA GRAFICAS*/
 .resultado{
     border-radius: 20px;
-    background-color: rgb(245, 216, 180);
+    background-color: hsl(220, 83%, 65%);
     padding: 15px;
     margin: 15px;
-    margin-left : 30px;
     align-items: center;
 }
 
 .cargamasiva{
-    border-radius: 30px;
-    background-color: rgb(245, 216, 180);
+    border-radius: 15px;
+    background-color: #deeaee;
     padding: 15px;
     margin: 15px;
-    margin-left : 30px;
+    margin-left : 10px;
 }
 
 .libreria{
@@ -25,29 +74,23 @@
     background-color: rgb(245, 180, 235);
     padding: 15px;
     margin: 15px;
+}
+.derecha{
+    border-radius: 30px;
+    background-color: rgb(241, 91, 219);
+    padding: 15px;
+    margin: 15px;
     margin-left : 30px;
-}
 
-h1 {
-    text-align:center;
 }
-
-h2 {
+h1,h2 {
     text-align: center;
 }
 
-#logindiv{
-    float: right;
-    border-radius: 30px;
-    background-color: rgb(245, 216, 180);
-    padding: 30px;
-    margin: 15px;
-}
 
-logoff{
-    float: right;
-}
 
-.manuales{
-    float: right;
+.test{
+    padding: 15px;
+    font-size: large;
+    width: 50%;
 }
