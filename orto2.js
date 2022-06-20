@@ -1099,6 +1099,7 @@ class NodoU {
         this.telefono = telefono
         this.libros = new ListaL()
         this.pendientes = new colaDisponibilidad()
+        this.cantidad = 0
 
         this.siguiente = null
         this.anterior = null
@@ -1230,6 +1231,36 @@ class ListaUsuario {
         }
     }
 
+    insertarTop(nombre, user, cantidad) {
+        let nuevo = new NodoU("dpi", nombre, user," correo"," rol", "pass"," telefono")
+        nuevo.cantidad = cantidad
+
+        if(this.primero == null){
+            this.primero = nuevo
+            this.ultimo = nuevo
+        } else if (nuevo.cantidad > this.primero.cantidad) {
+            nuevo.siguiente = this.primero;
+            this.primero.anterior = nuevo;
+            this.primero = nuevo;
+        } else {
+            let actual = this.primero;
+            while (actual.siguiente != null) {
+                if (nuevo.cantidad > actual.siguiente.cantidad) {
+                    nuevo.siguiente = actual.siguiente;
+                    actual.siguiente.anterior = nuevo;
+                    nuevo.anterior = actual;
+                    actual.siguiente = nuevo;
+                    break;
+                }
+                actual = actual.siguiente;
+            }
+            if (actual.siguiente == null) {
+                actual.siguiente = nuevo;
+                nuevo.anterior = actual;
+                this.ultimo = nuevo;
+            }
+        }
+    }
     printUsers() {
         if (this.primero == null) {
             return
@@ -1237,7 +1268,7 @@ class ListaUsuario {
         console.log("DATOS DE LOS CLIENTES")
         let actual = this.primero
         while (actual != null) {
-            console.log("Usuario: " + actual.user + " Nombre: " + actual.nombre + " Pass: " + actual.pass)
+            console.log("Usuario: " + actual.user + " Nombre: " + actual.nombre + " Cantidad: " + actual.cantidad)
             actual = actual.siguiente
         }
     }
@@ -1539,7 +1570,9 @@ function showSelectedUser() {
 
 /**MOSTRAR ELEMENTOS DE LA PAGINA PRINCIPAL*/
 function showHome() {
-    currentUser = null 
+    currentUser = null
+    
+    document.getElementById("toplibs").style.display = "none"
     document.getElementById("watchB").style.display = "none"
     document.getElementById("librospendientes").style.display = "none"
 
@@ -1593,6 +1626,7 @@ function showCargaMasiva() {
 
 function hideoptionsAdmin() {//arbolabb usuariosLibros pilaLibros toplibrospendientes librospendientes
     
+    document.getElementById("toplibs").style.display = "none"
     document.getElementById("watchB").style.display = "none"
     document.getElementById("librospendientes").style.display = "none"
     document.getElementById("pendientesAdmin").style.display = "none"
@@ -1723,7 +1757,7 @@ function agregarlibrosC(){
         let isbnactual = listado[i].id
         let tempb = librosGen.getNodebyIsbn(isbnactual)
         if(tempb){
-            console.log("usuario: "+tempb.user)
+            //console.log("usuario: "+tempb.user)
             
             if(tempb.cantidad == 0){
                 
@@ -1734,7 +1768,7 @@ function agregarlibrosC(){
                 restarlibrolibrerias(isbnactual)
                 currentUser.libros.insertar(tempb.nombreLibro)
             }
-            console.log(isbnactual)
+            //console.log(isbnactual)
 
         }
     }
@@ -1889,7 +1923,72 @@ function showpendientes(){
     .height(600)
     .renderDot(tt)
 }
+function showtopss(){
+    document.getElementById("topsele").style.display = "block"
+    document.getElementById("toplibs").style.display = "block"
+    document.getElementById("topsele").innerHTML = ""
 
+    let lib = document.getElementById("topsele")
+    let tempuser = new ListaUsuario()
+
+    let act = users.primero
+    while(act != null){
+        let size = 0
+        let book = act.libros.primero
+        while(book != null){
+            size += book.cantidad
+            book = book.siguiente
+        }
+        //console.log("libros: "+size)
+        tempuser.insertarTop(act.nombre,act.user,size)
+        //tempuser.insertar("dpi",act.nombre,act.user,"correo","rol","pass","tel")
+        act = act.siguiente
+    }
+
+    tempuser.printUsers()
+    let nn = 0
+    act = tempuser.primero
+    while(act != null && nn<5){
+        listop("topsele",act)
+        nn++
+        act = act.siguiente
+    }
+}
+
+function listop(div,libro){
+    let listado = document.getElementById(div)
+
+
+    let libronuevo = document.createElement('div')
+    libronuevo.className = 'libronuevo'
+    libronuevo.id = `${libro.nombre}`
+    libronuevo.innerHTML = `
+        <div>
+            <h4 class="titulo">Nombre ${libro.nombre}</h4>
+            <div class="body">
+                <p>User: ${libro.user}</p>
+                <hr>
+                
+                <p>Cantidad: ${libro.cantidad}</p>
+            </div>
+        </div>  
+        `
+    listado.append(libronuevo)
+}
+
+function sizeB(nodo){
+    let size = 0
+    let lib = nodo.libros
+    if(nodo.libros.primero == null){
+        return 0
+    }
+    let bk = nodo.libros.primero
+    while(bk != null){
+        size += bk.cantidad
+        bk = bk.siguiente
+    }
+    return size
+}
 
 function optionsUserr(){
     let opcionSelected = document.getElementById("opcionesuser").selectedIndex
@@ -1900,6 +1999,7 @@ function optionsUserr(){
         showCompra()
     } else if (opcionSelected == 2) {
         // tops
+        showtopss()
     } else if (opcionSelected == 3) {
         showpendientes()
     } else if (opcionSelected == 4) {
@@ -1933,6 +2033,8 @@ function optionsAdmin() {
         showCompra()
     } else if (opcionSelected == 2) {
         // tops
+        
+        showtopss()
     } else if (opcionSelected == 3) {
         showpendientes()
     } else if (opcionSelected == 4) {

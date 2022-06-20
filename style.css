@@ -20,7 +20,7 @@
 }
 
 /*   ELEMENTOS PARA COMPRAR*/
-#divThriller > div,#divFantasia > div ,#shoplist >div, #listautors >div, #watchBD >div , #watchBA > div{
+#divThriller > div,#divFantasia > div ,#shoplist >div, #listautors >div, #watchBD >div , #watchBA > div #top>div{
     width: 180px;
     background-color: cornflowerblue;
     border-radius: 15px;
