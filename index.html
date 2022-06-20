@@ -129,15 +129,27 @@
                 <h1>TOP DE COMPRADORES</h1>
             </div>
 
+
+
+            <div class="d-grid resultado gap-3" id="watchB">
+                <h1>ORDEN DESCENDENTE</h1>
+                <div class="flex-container" id="watchBD"></div>
+                <iframe class="IMG" src="ASCENDENTE.PNG" width="100%" height="500px"></iframe>
+                <h1>ORDEN ASCENDENTE</h1>
+                <div class="flex-container" id="watchBA"></div>
+                
+                <iframe class="IMG" src="DESCENDENTE.PNG" width="100%" height="500px"></iframe>
+            </div>
+
             <!--        LIBROS PENDIENTES USER/GENERAL-->
             <div class="d-grid resultado gap-3" id="librospendientes">
                 <h1>LIBROS PENDIENTES DEL USUARIO</h1>
-                <div id="pendientesUser"></div>
+                <div class="bbr" id="pendientesUser"></div>
                 
                 <div id="idPendAdmin">
                     <h1 id="">LIBROS PENDIENTES DEL GENERAL</h1>
-                    <div id="pendientesAdmin"></div>
-                    <div id="pilapendientesUser"></div>
+                    <div class="bbr" id="pendientesAdmin"></div>
+                    <div class="bbr" id="pilapendientesUser"></div>
                 </div>
                 
             </div>
@@ -166,12 +178,20 @@
             <div class=" bg-success bg-opacity-25 derecha" id="optionuser">
                 <h4> OPCIONES USUARIO</h4>
                 <h2 id="nombreUser">nombre user</h2>
-                <select class="form-select" aria-label="Default select example">
-                    <option value="1">Mostrar Librerias</option>
+                <select class="form-select" aria-label="Default select example" id="opcionesuser">
+                    <option value="1">Mostrar Autores</option>
                     <option value="2">Realizar Compra</option>
                     <option value="3">Ver TOPs</option>
-                  </select>
-                <button onclick="">Ingresar</button><br>
+                    <option value="4">Ver Libros Pendientes</option>
+                    <option value="5">Carga Masiva</option>
+                    <option value ="6">Librerias</option>
+                    <option value ="7">EJEMPLARES DISPONIBLES</option>
+                    <option value ="8">VER USUARIOS-LIBROS</option>
+                    <option value ="9">VER LIBROS</option>
+                  </select><br>
+                <button onclick="optionsUserr()">Ingresar</button><br>
+                
+                <button onclick="hideoptionsAdmin()">OcultarTodo</button><br>
             </div>
 
 
@@ -188,6 +208,7 @@
                     <option value ="6">Librerias</option>
                     <option value ="7">EJEMPLARES DISPONIBLES</option>
                     <option value ="8">VER USUARIOS-LIBROS</option>
+                    <option value ="9">VER LIBROS</option>
                   </select>
                 <button onclick="optionsAdmin()">Seleccionar</button><br>
                 <button onclick="hideoptionsAdmin()">OcultarTodo</button><br>

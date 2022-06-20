@@ -20,13 +20,19 @@
 }
 
 /*   ELEMENTOS PARA COMPRAR*/
-#divThriller > div,#divFantasia > div ,#shoplist >div, #listautors >div{
-    width: 200px;
+#divThriller > div,#divFantasia > div ,#shoplist >div, #listautors >div, #watchBD >div , #watchBA > div{
+    width: 180px;
     background-color: cornflowerblue;
     border-radius: 15px;
     margin: 10px;
     padding: 10px;
 
+}
+
+#watchBD,#watchBA{
+    background-color: darkkhaki;
+    border-radius: 10px;
+    align-items: flex-end;
 }
 
 #specificAutor{
@@ -87,6 +93,14 @@ h1,h2 {
     text-align: center;
 }
 
+.IMG{
+    align-items: center;
+}
+
+.bbr {
+    border-radius: 10px;
+    border-style: groove;
+}
 
 
 .test{
